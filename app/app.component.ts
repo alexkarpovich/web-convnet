@@ -1,7 +1,7 @@
 import './style.less'
 import {Component} from 'angular2/core'
 import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router'
-import {Convnet} from './convnet/components/convnet'
+import {Main} from './convnet/components/main'
 
 @Component({
     selector: 'app',
@@ -10,9 +10,9 @@ import {Convnet} from './convnet/components/convnet'
 		 	<router-outlet></router-outlet>
 		</div>
     `,
-    directives: [ROUTER_DIRECTIVES, Convnet]
+    directives: [ROUTER_DIRECTIVES, Main]
 })
 @RouteConfig([
-	{path: '/', name: 'Convnet', component: Convnet}
+	{path: '/', name: 'Main', component: Main}
 ])
 export class AppComponent {}
