@@ -13,4 +13,8 @@ export class Utils {
     public static getRandom(min, max) {
       return Math.random() * (max - min) + min;
     }
+
+    public static sigmoid(S:number) {
+        return 1/(1+Math.exp(-S));
+    }
 }

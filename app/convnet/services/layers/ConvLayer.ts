@@ -9,6 +9,7 @@ export class ConvLayer extends Layer {
     private inWidth:number;
     private inHeight:number;
     private shape:ConvShape;
+    private subsample:number[];
     private K:number[][];
     private in:number[];
     private convOut:number[][];
@@ -21,6 +22,7 @@ export class ConvLayer extends Layer {
         this.convOut = [];
         this.out = [];
         this.shape = this.getShapeFromString(params.shape);
+        this.subsample = params.subsample;
         this.count = params.count;
         this.init();
     }
@@ -37,29 +39,6 @@ export class ConvLayer extends Layer {
         }
 
         this.prepareInput();
-    }
-
-    private conv(kernel:number[]):number[] {
-        let result = [];
-        let p = 0;
-        let xRange = this.inWidth-this.size;
-        let yRange = this.inHeight-this.size;
-
-        for (let i=0; i<=xRange; i++) {
-            for (let j=0; j<=yRange; j++) {
-                let v = 0;
-
-                for (let k=0; k<this.size; k++) {
-                    for (let t=0; t<this.size; t++) {
-                        v += this.in[i+this.inWidth*j+k+t*this.inWidth] * kernel[k+this.size*t];
-                    }
-                }
-
-                result[p++] = v;
-            }
-        }
-
-        return result;
     }
 
     private prepareInput():void {
@@ -139,14 +118,60 @@ export class ConvLayer extends Layer {
         this.in = result;
     }
 
+    private conv(kernel:number[]):number[] {
+        let result = [];
+        let p = 0;
+        let xRange = this.inWidth-this.size;
+        let yRange = this.inHeight-this.size;
+
+        for (let i=0; i<=xRange; i++) {
+            for (let j=0; j<=yRange; j++) {
+                let v = 0;
+
+                for (let k=0; k<this.size; k++) {
+                    for (let t=0; t<this.size; t++) {
+                        v += this.in[i+this.inWidth*j+k+t*this.inWidth] * kernel[k+this.size*t];
+                    }
+                }
+
+                result[p++] = Utils.sigmoid(v);
+            }
+        }
+
+        return result;
+    }
+
+    private downsample(convolved:number[]):number[] {
+        let result = [];
+        let p = 0;
+        let size = this.getConvolvedSize();
+
+        for (let i=0; i<size[0]; i+=this.subsample[0]) {
+            for (let j=0; j<size[1]; j+=this.subsample[1]) {
+                let v = [];
+
+                for (let k=0; k<this.subsample[0]; k++) {
+                    for (let t=0; t<this.subsample[1]; t++) {
+                        v.push(this.in[i+size[0]*j+k+t*size[0]]);
+                    }
+                }
+
+                result[p++] = Math.max.apply(null, v);
+            }
+        }
+
+        return result;
+    }
+
     public feadforward() {
         let j = 0;
 
         for (let i=0; i<this.count; i++) {
-            this.convOut[j++] = this.conv(this.K[i]);
+            let convolved = this.conv(this.K[i]);
+            this.convOut[j] = convolved;
+            this.out[j] = this.downsample(convolved);
+            j++;
         }
-
-        console.log(this.convOut);
     }
 
     public backprop() {
@@ -159,6 +184,20 @@ export class ConvLayer extends Layer {
             case 'same': return ConvShape.SAME;
             case 'full': return ConvShape.FULL;
             default: return null;
+        }
+    }
+
+    private getConvolvedSize() {
+        let img = this.prev.getImage();
+
+        switch(this.shape) {
+            case ConvShape.VALID:
+                return [img.width-this.size+1, img.height-this.size+1];
+            case ConvShape.SAME:
+                return [img.width, img.height];
+            case ConvShape.FULL:
+            default:
+                return [img.width+this.size-1, img.height+this.size-1];
         }
     }
 }

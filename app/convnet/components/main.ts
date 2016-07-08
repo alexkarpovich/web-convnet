@@ -25,7 +25,7 @@ export class Main {
         let convnet = new Convnet({
             layers: [
                 {type:'input', image:context.getImageData(0,0,img.width,img.height)},
-                {type:'conv', size:5, count:6, shape:'same', activate: 'sigmoid'},
+                {type:'conv', size:5, count:6, shape:'same', subsample: [2,2], activate: 'sigmoid'},
                 {type:'fc', size: 300, activate: 'sigmoid'},
                 {type:'output', size: 10, activate: 'sigmoid'}
             ]
