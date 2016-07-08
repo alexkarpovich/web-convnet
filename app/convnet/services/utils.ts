@@ -1,5 +1,5 @@
 export class Utils {
-    public static img2data(srcData) {
+    public static img2data(srcData):number[] {
         let result = [];
         let d = srcData.data;
 
@@ -8,5 +8,9 @@ export class Utils {
         }
 
         return result;
+    }
+
+    public static getRandom(min, max) {
+      return Math.random() * (max - min) + min;
     }
 }

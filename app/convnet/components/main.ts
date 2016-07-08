@@ -1,17 +1,9 @@
 import {Component, ViewChild} from 'angular2/core'
 import {Convnet} from '../services/Convnet';
 
-const IMAGE_SIZE = 512;
-
 @Component({
     selector: 'main',
     template: `
-    <span>
-    <img #source>
-    </span>
-    <span>
-    <canvas #dest width="512" height="512"></canvas>
-    </span>
     `
 })
 export class Main {
@@ -20,24 +12,26 @@ export class Main {
 
     ngOnInit() {
         let src = new Image();
-        src.src = '/images/lenna.png';
+        src.src = '/images/img64.jpg';
         src.onload = event => this.init(event);
     }
 
     init(event) {
         let canvas = document.createElement('canvas');
         let context = canvas.getContext('2d');
-        context.drawImage(event.target,0,0);
+        let img = event.target;
+        context.drawImage(img,0,0);
 
         let convnet = new Convnet({
-            image: context.getImageData(0,0,canvas.width,canvas.height),
             layers: [
-                {type:'convolution', kernelSize:5, kernelCount:6, clip:'valid'},
-                {type:'downsampling', size:2},
-                {type:'fully-connected', size: 300},
-                {type:'output', size: 10}
+                {type:'input', image:context.getImageData(0,0,img.width,img.height)},
+                {type:'conv', size:5, count:6, shape:'same', activate: 'sigmoid'},
+                {type:'fc', size: 300, activate: 'sigmoid'},
+                {type:'output', size: 10, activate: 'sigmoid'}
             ]
         });
+
+        convnet.feadforward();
     }
 
 

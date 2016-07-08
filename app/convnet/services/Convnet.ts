@@ -1,28 +1,52 @@
 import {Injectable} from 'angular2/core'
 import {Utils} from './utils'
+import {Layer} from './Layer'
+import {InputLayer} from './layers/InputLayer'
+import {ConvLayer} from './layers/ConvLayer'
+import {FCLayer} from './layers/FCLayer'
+import {OutputLayer} from './layers/OutputLayer'
 
 interface IConvnetParams {
-    image:ImageData,
-    layers:any[]
+    layers:any[];
 };
 
 @Injectable()
 export class Convnet {
-    private W:number[][][];
-    private in:number[];
-    private width:number;
-    private height:number;
+    private layers:any[];
 
-    constructor(params:any) {
-        this.width = params.image.width;
-        this.height = params.image.height;
-        this.in = Utils.img2data(params.image);
-        this.initLayers();
+    constructor(params:IConvnetParams) {
+        this.initLayers(params.layers);
     }
 
     private initLayers(layers:any) {
+        this.layers = [];
+        let prevLayer = null;
+
         layers.forEach(layer => {
-            this.layers.push(new Layer())
+            let currentLayer;
+            layer.prev = prevLayer;
+
+            switch(layer.type) {
+                case 'input':
+                    currentLayer = new InputLayer(layer);
+                    break;
+                case 'conv':
+                    currentLayer = new ConvLayer(layer);
+                    break;
+                case 'fc':
+                    currentLayer = new FCLayer(layer);
+                    break;
+                case 'output':
+                    currentLayer = new OutputLayer(layer);
+                    break;
+            }
+
+            this.layers.push(currentLayer);
+            prevLayer = currentLayer;
         });
+    }
+
+    public feadforward() {
+        this.layers.forEach(layer => layer.feadforward());
     }
 }
