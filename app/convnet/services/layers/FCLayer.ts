@@ -55,7 +55,7 @@ export class FCLayer extends Layer {
 
         for (let j=0; j<this.size[0]; j++) {
             for (let i=0; i<prevConfig['size'][0];i++) {
-                this.W[i][j]+=0.1*this.deltas[j]*Utils.sigmoidDerivative(this.in[j])*prevOutput[i];
+                this.W[i][j]+=0.001*this.deltas[j]*Utils.sigmoidDerivative(this.in[j])*prevOutput[i];
             }
         }
     }

@@ -101,8 +101,8 @@ export class ConvLayer extends Layer {
         this.image = result;
     }
 
-    private conv(kernel:number[]):number[] {
-        let result = [];
+    private conv(kernel:number[]):any {
+        let result = {S:[], A:[]};
         let p = 0;
         let xRange = this.inWidth-this.size[0];
         let yRange = this.inHeight-this.size[1];
@@ -117,8 +117,8 @@ export class ConvLayer extends Layer {
                     }
                 }
 
-                this.in[p] = v;
-                result[p++] = Utils.sigmoid(v);
+                result.S[p] = v;
+                result.A[p++] = Utils.sigmoid(v);
             }
         }
 
@@ -127,10 +127,13 @@ export class ConvLayer extends Layer {
 
     public feadforward() {
         this.prepareInput();
+        this.in = [];
         this.out = [];
 
         for (let i=0; i<this.count; i++) {
-            this.out = this.out.concat(this.conv(this.K[i]));
+            let result = this.conv(this.K[i]);
+            this.in = this.in.concat(result.S);
+            this.out = this.out.concat(result.A);
         }
     }
 
@@ -165,7 +168,7 @@ export class ConvLayer extends Layer {
                     for (let a=0; a<this.size[0]; a++) {
                         for (let b=0; b<this.size[1]; b++) {
                             this.K[i][a+this.size[0]*b] +=
-                                0.1*this.deltas[p]*Utils.sigmoidDerivative(this.in[p])*this.image[j+this.inWidth*k+a+b*this.inWidth];
+                                0.001*this.deltas[p]*Utils.sigmoidDerivative(this.in[p])*this.image[j+this.inWidth*k+a+b*this.inWidth];
                         }
                     }
                 }
