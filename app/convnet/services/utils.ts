@@ -17,4 +17,10 @@ export class Utils {
     public static sigmoid(S:number) {
         return 1/(1+Math.exp(-S));
     }
+
+    public static sigmoidDerivative(S:number) {
+        let x = Utils.sigmoid(S);
+        
+        return x * (1 - x);
+    }
 }

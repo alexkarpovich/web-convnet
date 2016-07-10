@@ -8,28 +8,22 @@ export enum ConvShape {
 export class ConvLayer extends Layer {
     private inWidth:number;
     private inHeight:number;
+    private image:number[];
     private shape:ConvShape;
-    private subsample:number[];
     private K:number[][];
-    private in:number[];
-    private convOut:number[][];
-    private out:number[][];
     private count:number;
+    private deltas:number[];
 
     constructor(params:any) {
         super(params);
-        this.in = [];
-        this.convOut = [];
-        this.out = [];
         this.shape = this.getShapeFromString(params.shape);
-        this.subsample = params.subsample;
         this.count = params.count;
         this.init();
     }
 
     private init():void {
         this.K = [];
-        let kernelSize = Math.pow(this.size, 2);
+        let kernelSize = this.size[0]*this.size[1];
 
         for (let i=0;i<this.count;i++) {
             this.K[i] = [];
@@ -37,103 +31,93 @@ export class ConvLayer extends Layer {
                 this.K[i][j] = Utils.getRandom(-1, 1);
             }
         }
-
-        this.prepareInput();
     }
 
     private prepareInput():void {
         switch(this.shape) {
-            case ConvShape.VALID:
-                this.convertToValid();
-                break;
-            case ConvShape.SAME:
-                this.convertToSame();
-                break;
+            case ConvShape.VALID: return this.convertToValid();
+            case ConvShape.SAME: return this.convertToSame();
             case ConvShape.FULL:
-            default:
-                this.convertToFull();
+            default: return this.convertToFull();
         }
     }
 
     private convertToValid():void {
-        let img = this.prev.getImage();
+        let prevSize = this.net.getSize();
 
-        this.in = this.prev.getOut();
-        this.inWidth = img.width;
-        this.inHeight = img.height;
+        this.image = this.net.getInput();
+        this.inWidth = prevSize[0];
+        this.inHeight = prevSize[1];
 
     }
 
     private convertToSame() {
-        let img = this.prev.getImage();
-        let out = this.prev.getOut();
+        let prevSize = this.net.getSize();
+        let out = this.net.getInput();
         let fPad, sPad, result = [];
-        let isEven = this.size%2==0;
+        let isEven = this.size[0]%2==0;
         if(isEven) {
-            fPad = ~~(this.size/2);
+            fPad = ~~(this.size[0] / 2);
             sPad = ~~(fPad / 2);
         } else {
-            fPad = sPad = ~~(this.size/2);
+            fPad = sPad = ~~(this.size[0] / 2);
         }
 
-        this.inWidth = img.width+fPad+sPad;
-        this.inHeight = img.height+fPad+sPad;
-
-        console.log('Same:', this.inWidth, this.inHeight);
+        this.inWidth = prevSize[0]+fPad+sPad;
+        this.inHeight = prevSize[1]+fPad+sPad;
 
         for (let i=0; i<this.inWidth; i++) {
             for (let j=0; j<this.inHeight; j++) {
-                if(i<fPad || i>img.width+fPad-1 || j<fPad || j>img.height+fPad-1) {
+                if(i<fPad || i>prevSize[0]+fPad-1 || j<fPad || j>prevSize[1]+fPad-1) {
                     result[i+this.inWidth*j] = 0;
                 } else {
-                    result[i+this.inWidth*j] = out[i-fPad+img.width*(j-fPad)];
+                    result[i+this.inWidth*j] = out[i-fPad+prevSize[0]*(j-fPad)];
                 }
             }
         }
 
-        this.in = result;
+        this.image = result;
     }
 
     private convertToFull() {
-        let img = this.prev.getImage();
-        let out = this.prev.getOut();
-        let pad = this.size-1,
+        let prevSize = this.net.getSize();
+        let out = this.net.getInput();
+        let pad = this.size[0]-1,
             result = [];
 
-        this.inWidth = img.width+2*pad;
-        this.inHeight = img.height+2*pad;
-
-        console.log('Full:', this.inWidth, this.inHeight);
+        this.inWidth = prevSize[0]+2*pad;
+        this.inHeight = prevSize[1]+2*pad;
 
         for (let i=0; i<this.inWidth; i++) {
             for (let j=0; j<this.inHeight; j++) {
-                if(i<pad || i>img.width+pad-1 || j<pad || j>img.height+pad-1) {
+                if(i<pad || i>prevSize[0]+pad-1 || j<pad || j>prevSize[1]+pad-1) {
                     result[i+this.inWidth*j] = 0;
                 } else {
-                    result[i+this.inWidth*j] = out[i-pad+img.width*(j-pad)];
+                    result[i+this.inWidth*j] = out[i-pad+prevSize[0]*(j-pad)];
                 }
             }
         }
 
-        this.in = result;
+        this.image = result;
     }
 
     private conv(kernel:number[]):number[] {
         let result = [];
         let p = 0;
-        let xRange = this.inWidth-this.size;
-        let yRange = this.inHeight-this.size;
+        let xRange = this.inWidth-this.size[0];
+        let yRange = this.inHeight-this.size[1];
 
         for (let i=0; i<=xRange; i++) {
             for (let j=0; j<=yRange; j++) {
                 let v = 0;
 
-                for (let k=0; k<this.size; k++) {
-                    for (let t=0; t<this.size; t++) {
-                        v += this.in[i+this.inWidth*j+k+t*this.inWidth] * kernel[k+this.size*t];
+                for (let k=0; k<this.size[0]; k++) {
+                    for (let t=0; t<this.size[1]; t++) {
+                        v += this.image[i+this.inWidth*j+k+t*this.inWidth] * kernel[k+this.size[0]*t];
                     }
                 }
 
+                this.in[p] = v;
                 result[p++] = Utils.sigmoid(v);
             }
         }
@@ -141,41 +125,52 @@ export class ConvLayer extends Layer {
         return result;
     }
 
-    private downsample(convolved:number[]):number[] {
-        let result = [];
-        let p = 0;
-        let size = this.getConvolvedSize();
-
-        for (let i=0; i<size[0]; i+=this.subsample[0]) {
-            for (let j=0; j<size[1]; j+=this.subsample[1]) {
-                let v = [];
-
-                for (let k=0; k<this.subsample[0]; k++) {
-                    for (let t=0; t<this.subsample[1]; t++) {
-                        v.push(this.in[i+size[0]*j+k+t*size[0]]);
-                    }
-                }
-
-                result[p++] = Math.max.apply(null, v);
-            }
-        }
-
-        return result;
-    }
-
     public feadforward() {
-        let j = 0;
+        this.prepareInput();
+        this.out = [];
 
         for (let i=0; i<this.count; i++) {
-            let convolved = this.conv(this.K[i]);
-            this.convOut[j] = convolved;
-            this.out[j] = this.downsample(convolved);
-            j++;
+            this.out = this.out.concat(this.conv(this.K[i]));
         }
     }
 
     public backprop() {
+        let nextDeltas = this.next.getDeltas();
+        let subsize = this.next.getSize();
+        let convSize = this.getConvolvedSize();
+        let p = 0;
+        this.deltas = [];
 
+        for (let i=0; i<this.count; i++) {
+            for (let j=0; j<convSize[0]; j+=subsize[0]) {
+                for (let k=0; k<convSize[1]; k+=subsize[1], p++) {
+                    let delta = nextDeltas[p]/(subsize[0]*subsize[1]);
+
+                    for (let a=0; a<subsize[0]; a++) {
+                        for (let b=0; b<subsize[1]; b++) {
+                            this.deltas[j+convSize[0]*k+a+b*convSize[0]+i*convSize[0]*convSize[1]] = delta;
+                        }
+                    }
+                }
+            }
+        }
+
+        let xRange = this.inWidth-this.size[0];
+        let yRange = this.inHeight-this.size[1];
+        p = 0;
+
+        for (let i=0; i<this.count; i++) {
+            for (let j=0; j<xRange; j++) {
+                for (let k=0; k<yRange; k++,p++) {
+                    for (let a=0; a<this.size[0]; a++) {
+                        for (let b=0; b<this.size[1]; b++) {
+                            this.K[i][a+this.size[0]*b] +=
+                                0.1*this.deltas[p]*Utils.sigmoidDerivative(this.in[p])*this.image[j+this.inWidth*k+a+b*this.inWidth];
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private getShapeFromString(shape:string) {
@@ -188,16 +183,33 @@ export class ConvLayer extends Layer {
     }
 
     private getConvolvedSize() {
-        let img = this.prev.getImage();
+        let prevSize = this.net.getSize();
 
         switch(this.shape) {
             case ConvShape.VALID:
-                return [img.width-this.size+1, img.height-this.size+1];
+                return [prevSize[0]-this.size[0]+1, prevSize[1]-this.size[0]+1];
             case ConvShape.SAME:
-                return [img.width, img.height];
+                return [prevSize[0], prevSize[1]];
             case ConvShape.FULL:
             default:
-                return [img.width+this.size-1, img.height+this.size-1];
+                return [prevSize[0]+this.size[0]-1, prevSize[1]+this.size[1]-1];
         }
+    }
+
+    private getCount() {
+        return this.count;
+    }
+
+    public getConfig() {
+        return {
+            type: this.getType(),
+            kernelSize: this.getSize(),
+            featureCount: this.count,
+            size: this.getConvolvedSize()
+        };
+    }
+
+    public getOutput() {
+        return {out: this.out};
     }
 }
