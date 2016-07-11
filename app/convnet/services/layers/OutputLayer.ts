@@ -34,6 +34,8 @@ export class OutputLayer extends Layer {
             this.in[j] = S;
             this.out[j] = Utils.sigmoid(S);
         }
+
+        this.net.setOutput(this.out);
     }
 
     public backprop() {

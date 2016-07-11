@@ -1,17 +1,17 @@
 import {Component, ViewChild} from 'angular2/core'
-import {Convnet} from '../services/Convnet';
+import {ConvnetService} from '../services/ConvnetService';
 
 @Component({
     selector: 'main',
     template: `
-        <button (click)="run()">Run network</button>
+        <button id="startTraining" (click)="startTraining()">Start Training</button>
+        <button id="stopTraining" (click)="stopTraining()">Stop Training</button>
     `
 })
 export class Main {
-    @ViewChild('source') source:any;
-    @ViewChild('dest') dest:any;
+    private convnetService:ConvnetService;
 
-    run() {
+    public startTraining() {
         this.preloadImages([
             {path: '/images/cat1.jpg', label:[1,0]},
             {path: '/images/cat2.png', label:[1,0]},
@@ -20,6 +20,10 @@ export class Main {
             {path: '/images/dog2.jpg', label:[0,1]},
             {path: '/images/dog3.jpg', label:[0,1]},
         ]);
+    }
+
+    stopTraining() {
+        this.convnetService.stopTraining();
     }
 
     private preloadImages(examples:any[]) {
@@ -49,7 +53,7 @@ export class Main {
     private init(examples) {
         console.log('Main', examples);
 
-        let convnet = new Convnet({
+        this.convnetService = new ConvnetService({
             size: [64, 64],
             layers: [
                 {type:'conv', size:[5,5], count:6, shape:'same', activate: 'sigmoid'},
@@ -59,12 +63,12 @@ export class Main {
             ]
         });
 
-        convnet.train({
+        this.convnetService.train({
             trainingSet: examples,
             learningRate: 0.01,
             maxIterations: 1000,
-            minError: 0.1
-        });
+            minError: 1
+        }, () => this.convnetService.test(examples[0].input));
     }
 
 

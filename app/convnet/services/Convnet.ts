@@ -1,4 +1,3 @@
-import {Injectable} from 'angular2/core'
 import {Utils} from './utils'
 import {Layer, LayerType} from './Layer'
 import {ConvLayer} from './layers/ConvLayer'
@@ -6,14 +5,14 @@ import {PoolingLayer} from './layers/PoolingLayer'
 import {FCLayer} from './layers/FCLayer'
 import {OutputLayer} from './layers/OutputLayer'
 
-interface IConvnetParams {
+export interface IConvnetParams {
     size:number[];
     layers:any[];
 }
 
-@Injectable()
 export class Convnet {
     private in:number[];
+    private out:number[];
     private label:number[];
     private size:number[];
     private layers:any[];
@@ -33,8 +32,8 @@ export class Convnet {
 
         layers.forEach(layer => {
             let currentLayer;
-            layer.net = this;
-            layer.prev = prevLayer;
+            layer['prev'] = prevLayer;
+            layer['net'] = this;
 
             switch(layer.type) {
                 case 'conv':
@@ -57,7 +56,7 @@ export class Convnet {
         });
     }
 
-    public train(params:any) {
+    public train(params:any, callback) {
         console.info('Convnet:train');
         let i = 1, error = 0;
         while (i <= params.maxIterations || error < params.minError) {
@@ -74,6 +73,16 @@ export class Convnet {
             console.groupEnd();
             i++;
         }
+        callback && callback();
+    }
+
+    public test(image:any) {
+        console.info('Convnet:test');
+        this.setInput(image);
+        this.feadforward();
+        console.log(this.out);
+
+        return this.out;
     }
 
     public feadforward() {
@@ -103,6 +112,15 @@ export class Convnet {
 
     public getSize() {
         return this.size;
+    }
+
+    public setInput(image:ImageData) {
+        this.prepareInput(image);
+        this.size = [image.width, image.height];
+    }
+
+    public setOutput(out:number[]) {
+        this.out = out;
     }
 
     public setExample(input:any, label:any) {

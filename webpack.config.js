@@ -37,5 +37,11 @@ module.exports = {
   plugins: [
     new webpack.optimize.CommonsChunkPlugin(/* chunkName= */"vendor", /* filename= */"./dist/vendor.bundle.js"),
     new ExtractTextPlugin('./dist/style.css'),
-  ]
+  ],
+  worker: {
+    output: {
+      filename: '[name].worker.js',
+      chunkFilename: '[name].worker.js'
+    }
+  }
 }
