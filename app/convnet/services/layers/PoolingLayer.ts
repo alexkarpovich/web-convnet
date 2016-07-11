@@ -16,11 +16,11 @@ export class PoolingLayer extends Layer {
 
         for (let i=0; i<size[0]; i+=this.size[0]) {
             for (let j=0; j<size[1]; j+=this.size[1]) {
-                let v = [];
+                let v = [], highIndex = i+size[0]*j;
 
                 for (let k=0; k<this.size[0]; k++) {
                     for (let t=0; t<this.size[1]; t++) {
-                        v.push(this.in[i+size[0]*j+k+t*size[0]]);
+                        v.push(this.in[highIndex+k+t*size[0]]);
                     }
                 }
 

@@ -4,12 +4,26 @@ import {ConvnetService} from '../services/ConvnetService';
 @Component({
     selector: 'main',
     template: `
+        <canvas #canvas class="convnet-view"></canvas>
         <button id="startTraining" (click)="startTraining()">Start Training</button>
         <button id="stopTraining" (click)="stopTraining()">Stop Training</button>
     `
 })
 export class Main {
+    @ViewChild('canvas') canvas:any;
     private convnetService:ConvnetService;
+
+    constructor() {
+        this.convnetService = new ConvnetService({
+            size: [64, 64],
+            layers: [
+                {type:'conv', size:[5,5], count:6, shape:'same', activate: 'sigmoid'},
+                {type:'pooling', size: [2,2]},
+                {type:'fc', size: [300], activate: 'sigmoid'},
+                {type:'output', size: [2], activate: 'sigmoid'}
+            ]
+        });
+    }
 
     public startTraining() {
         this.preloadImages([
@@ -44,24 +58,14 @@ export class Main {
                 loadedCount++;
 
                 if (examples.length == loadedCount) {
-                    this.init(result);
+                    this.doTrain(result);
                 }
             };
         });
     }
 
-    private init(examples) {
+    private doTrain(examples) {
         console.log('Main', examples);
-
-        this.convnetService = new ConvnetService({
-            size: [64, 64],
-            layers: [
-                {type:'conv', size:[5,5], count:6, shape:'same', activate: 'sigmoid'},
-                {type:'pooling', size: [2,2]},
-                {type:'fc', size: [300], activate: 'sigmoid'},
-                {type:'output', size: [2], activate: 'sigmoid'}
-            ]
-        });
 
         this.convnetService.train({
             trainingSet: examples,

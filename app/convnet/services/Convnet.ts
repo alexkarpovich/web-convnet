@@ -16,9 +16,11 @@ export class Convnet {
     private label:number[];
     private size:number[];
     private layers:any[];
+    private isTraining:boolean;
 
     constructor(params:IConvnetParams) {
         this.size = params.size;
+        this.isTraining = false;
         this.prepareLayers(params.layers);
     }
 
@@ -58,22 +60,48 @@ export class Convnet {
 
     public train(params:any, callback) {
         console.info('Convnet:train');
-        let i = 1, error = 0;
-        while (i <= params.maxIterations || error < params.minError) {
-            error = 0;
-            console.group('Iteration '+i);
-            console.time(''+i);
+        let i = 1;
+        this.isTraining = true;
+
+        let trainCycle = () => {
+            let error = 0;
+
             params.trainingSet.forEach(example => {
                 this.setExample(example.input, example.label);
                 this.feadforward();
                 error += this.backprop();
             });
+
+            return error;
+        };
+
+        let iterate = () => {
+            if (!this.isTraining) {
+                callback && callback();
+                return;
+            }
+
+            console.group('Iteration '+i);
+            console.time(''+i);
+            let error = trainCycle();
+
             console.info('Error:', error);
             console.timeEnd(''+i);
             console.groupEnd();
+
+            if (error > params.minError) {
+                setTimeout(() => iterate(), 0);
+            } else {
+                callback && callback();
+            }
             i++;
-        }
-        callback && callback();
+        };
+
+        iterate();
+    }
+
+    public stopTraining() {
+        this.isTraining = false;
     }
 
     public test(image:any) {

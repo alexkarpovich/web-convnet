@@ -109,11 +109,11 @@ export class ConvLayer extends Layer {
 
         for (let i=0; i<=xRange; i++) {
             for (let j=0; j<=yRange; j++) {
-                let v = 0;
+                let v = 0, highIndex = i+this.inWidth*j;
 
                 for (let k=0; k<this.size[0]; k++) {
                     for (let t=0; t<this.size[1]; t++) {
-                        v += this.image[i+this.inWidth*j+k+t*this.inWidth] * kernel[k+this.size[0]*t];
+                        v += this.image[highIndex+k+t*this.inWidth] * kernel[k+this.size[0]*t];
                     }
                 }
 
@@ -141,17 +141,19 @@ export class ConvLayer extends Layer {
         let nextDeltas = this.next.getDeltas();
         let subsize = this.next.getSize();
         let convSize = this.getConvolvedSize();
-        let p = 0;
+        let p = 0, sSize = subsize[0]*subsize[1], cSize = convSize[0]*convSize[1];
         this.deltas = [];
 
         for (let i=0; i<this.count; i++) {
+            let offset = i*cSize;
             for (let j=0; j<convSize[0]; j+=subsize[0]) {
                 for (let k=0; k<convSize[1]; k+=subsize[1], p++) {
-                    let delta = nextDeltas[p]/(subsize[0]*subsize[1]);
+                    let delta = nextDeltas[p]/sSize,
+                        highIndex = j+convSize[0]*k;
 
                     for (let a=0; a<subsize[0]; a++) {
                         for (let b=0; b<subsize[1]; b++) {
-                            this.deltas[j+convSize[0]*k+a+b*convSize[0]+i*convSize[0]*convSize[1]] = delta;
+                            this.deltas[highIndex+a+b*convSize[0]+offset] = delta;
                         }
                     }
                 }
@@ -165,10 +167,11 @@ export class ConvLayer extends Layer {
         for (let i=0; i<this.count; i++) {
             for (let j=0; j<xRange; j++) {
                 for (let k=0; k<yRange; k++,p++) {
+                    let highIndex = j+this.inWidth*k;
                     for (let a=0; a<this.size[0]; a++) {
                         for (let b=0; b<this.size[1]; b++) {
                             this.K[i][a+this.size[0]*b] +=
-                                0.001*this.deltas[p]*Utils.sigmoidDerivative(this.in[p])*this.image[j+this.inWidth*k+a+b*this.inWidth];
+                                0.001*this.deltas[p]*Utils.sigmoidDerivative(this.in[p])*this.image[highIndex+a+b*this.inWidth];
                         }
                     }
                 }

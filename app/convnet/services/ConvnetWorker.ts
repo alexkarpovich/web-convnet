@@ -4,7 +4,6 @@ let convnet:Convnet = null;
 let trainProcId = null;
 
 self.addEventListener('message', event => {
-    console.log(event);
     switch(event.data.type) {
         case 'convnet:init':
             convnet = new Convnet(event.data.content);
@@ -21,8 +20,8 @@ self.addEventListener('message', event => {
             }
             break;
         case 'train:stop':
-            if(trainProcId) {
-                clearTimeout(trainProcId);
+            if(convnet) {
+                convnet.stopTraining();
                 self.postMessage({type: 'train', content: 'Training is successfully stopped'});
             } else {
                 self.postMessage({type: 'train', content: 'Convnet is not being trained yet.'});

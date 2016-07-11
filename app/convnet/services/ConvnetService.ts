@@ -15,8 +15,6 @@ export class ConvnetService {
     }
 
     private onMessage(event) {
-        console.log(event);
-
         switch(event.data.type) {
             case 'train:done':
                 this.trainCallback && this.trainCallback();
