@@ -138,6 +138,7 @@ export class ConvLayer extends Layer {
     }
 
     public backprop() {
+        let alpha = this.net.getLearningRate();
         let nextDeltas = this.next.getDeltas();
         let subsize = this.next.getSize();
         let convSize = this.getConvolvedSize();
@@ -171,7 +172,7 @@ export class ConvLayer extends Layer {
                     for (let a=0; a<this.size[0]; a++) {
                         for (let b=0; b<this.size[1]; b++) {
                             this.K[i][a+this.size[0]*b] +=
-                                0.001*this.deltas[p]*Utils.sigmoidDerivative(this.in[p])*this.image[highIndex+a+b*this.inWidth];
+                                alpha*this.deltas[p]*Utils.sigmoidDerivative(this.in[p])*this.image[highIndex+a+b*this.inWidth];
                         }
                     }
                 }
@@ -217,5 +218,16 @@ export class ConvLayer extends Layer {
 
     public getOutput() {
         return {out: this.out};
+    }
+
+    public toJSON() {
+        return {
+            type: this.getType(),
+            size: this.getSize(),
+            shape: this.shape,
+            count: this.count,
+            outSize: this.getConvolvedSize(),
+            output: this.in
+        };
     }
 }

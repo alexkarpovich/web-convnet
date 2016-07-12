@@ -4,6 +4,7 @@ import ConvnetWorker = require('worker!./ConvnetWorker')
 export class ConvnetService {
     private convnetWorker:Worker;
     private trainCallback:any;
+    private stateCallback:any;
 
     constructor(params:IConvnetParams) {
         this.convnetWorker = new ConvnetWorker;
@@ -18,6 +19,9 @@ export class ConvnetService {
         switch(event.data.type) {
             case 'train:done':
                 this.trainCallback && this.trainCallback();
+                break;
+            case 'net:state':
+                this.stateCallback && this.stateCallback(event.data.content);
                 break;
         }
     }
@@ -47,5 +51,12 @@ export class ConvnetService {
             type: 'train:stop',
             content:''
         });
+    }
+
+    public getState(callback) {
+        this.convnetWorker.postMessage({
+            type: 'net:getState'
+        });
+        this.stateCallback = callback;
     }
 }

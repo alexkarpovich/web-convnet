@@ -62,4 +62,6 @@ export class Layer {
     public feadforward() {}
 
     public backprop() {}
+
+    public toJSON() {}
 }

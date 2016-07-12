@@ -73,4 +73,14 @@ export class PoolingLayer extends Layer {
     public getDeltas() {
         return this.deltas;
     }
+
+    public toJSON() {
+        return {
+            type: this.getType(),
+            size: this.getSize(),
+            output: this.out,
+            count: this.getConfig()['count'],
+            outSize: this.getConfig()['size']
+        };
+    }
 }

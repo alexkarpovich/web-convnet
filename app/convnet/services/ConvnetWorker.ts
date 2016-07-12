@@ -1,7 +1,14 @@
 import {Convnet} from './Convnet';
 
 let convnet:Convnet = null;
-let trainProcId = null;
+
+function isNetInit() {
+    if (!convnet) {
+        self.postMessage({type: 'error', content: 'Convnet is not created yet.'});
+    }
+
+    return !!convnet;
+}
 
 self.addEventListener('message', event => {
     switch(event.data.type) {
@@ -10,30 +17,30 @@ self.addEventListener('message', event => {
             self.postMessage({type: 'convnet', content:'Convnet successfully created'});
             break;
         case 'train:start':
-            if (convnet) {
-                trainProcId = setTimeout(() => convnet.train(event.data.content, () => {
-                    self.postMessage({type: 'train:done'});
-                }),0);
-                self.postMessage({type: 'train', content: 'Training is successfully started'});
-            } else {
-                self.postMessage({type: 'train', content: 'Convnet is not created yet.'});
-            }
+            if (!isNetInit()) return;
+
+            setTimeout(() => convnet.train(event.data.content, () => {
+                self.postMessage({type: 'train:done'});
+            }),0);
+            self.postMessage({type: 'train', content: 'Training is successfully started'});
             break;
         case 'train:stop':
-            if(convnet) {
-                convnet.stopTraining();
-                self.postMessage({type: 'train', content: 'Training is successfully stopped'});
-            } else {
-                self.postMessage({type: 'train', content: 'Convnet is not being trained yet.'});
-            }
+            if (!isNetInit()) return;
+
+            convnet.stopTraining();
+            self.postMessage({type: 'train', content: 'Training is successfully stopped'});
             break;
         case 'test':
-            if (convnet) {
-                let result = convnet.test(event.data.content);
-                self.postMessage({type: 'test', content: result});
-            } else {
-                self.postMessage({type: 'test', content: 'Convnet is not created yet.'});
-            }
+            if (!isNetInit()) return;
+
+            let result = convnet.test(event.data.content);
+            self.postMessage({type: 'test', content: result});
+            break;
+        case 'net:getState':
+            if (!isNetInit()) return;
+
+            self.postMessage({type: 'net:state', content: convnet.getState()});
+            break;
     }
 
 });

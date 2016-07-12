@@ -16,6 +16,7 @@ export class Convnet {
     private label:number[];
     private size:number[];
     private layers:any[];
+    private learningRate:number;
     private isTraining:boolean;
 
     constructor(params:IConvnetParams) {
@@ -61,6 +62,7 @@ export class Convnet {
     public train(params:any, callback) {
         console.info('Convnet:train');
         let i = 1;
+        this.learningRate = params.learningRate;
         this.isTraining = true;
 
         let trainCycle = () => {
@@ -140,6 +142,25 @@ export class Convnet {
 
     public getSize() {
         return this.size;
+    }
+
+    public getLearningRate() {
+        return this.learningRate;
+    }
+
+    public getState() {
+        let state = {
+            input: this.in,
+            output: this.out,
+            size: this.size,
+            layers: []
+        };
+
+        this.layers.forEach(layer => {
+            state.layers.push(layer.toJSON());
+        });
+
+        return state;
     }
 
     public setInput(image:ImageData) {

@@ -1,16 +1,17 @@
 import {Component, ViewChild} from 'angular2/core'
 import {ConvnetService} from '../services/ConvnetService';
+import {ConvnetView} from './convnet-view';
 
 @Component({
     selector: 'main',
     template: `
-        <canvas #canvas class="convnet-view"></canvas>
+        <convnet-view [convnetService]="convnetService"></convnet-view>
         <button id="startTraining" (click)="startTraining()">Start Training</button>
         <button id="stopTraining" (click)="stopTraining()">Stop Training</button>
-    `
+    `,
+    directives: [ConvnetView]
 })
 export class Main {
-    @ViewChild('canvas') canvas:any;
     private convnetService:ConvnetService;
 
     constructor() {
@@ -69,9 +70,9 @@ export class Main {
 
         this.convnetService.train({
             trainingSet: examples,
-            learningRate: 0.01,
+            learningRate: 0.0001,
             maxIterations: 1000,
-            minError: 1
+            minError: 0.1
         }, () => this.convnetService.test(examples[0].input));
     }
 
