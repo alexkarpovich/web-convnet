@@ -15,7 +15,7 @@ export class LayerView {
         let cnx = cnv.getContext('2d');
 
         this.layer.images && this.layer.images.forEach((imgData, key) => {
-            cnx.putImageData(imgData, key*imgData.width+10, 0);
+            cnx.putImageData(imgData, key*imgData.width+20, 0);
         });
     }
 }

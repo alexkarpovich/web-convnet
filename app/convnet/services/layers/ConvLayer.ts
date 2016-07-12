@@ -66,8 +66,8 @@ export class ConvLayer extends Layer {
         this.inWidth = prevSize[0]+fPad+sPad;
         this.inHeight = prevSize[1]+fPad+sPad;
 
-        for (let i=0; i<this.inWidth; i++) {
-            for (let j=0; j<this.inHeight; j++) {
+        for (let j=0; j<this.inHeight; j++) {
+            for (let i=0; i<this.inWidth; i++) {
                 if(i<fPad || i>prevSize[0]+fPad-1 || j<fPad || j>prevSize[1]+fPad-1) {
                     result[i+this.inWidth*j] = 0;
                 } else {
@@ -88,8 +88,8 @@ export class ConvLayer extends Layer {
         this.inWidth = prevSize[0]+2*pad;
         this.inHeight = prevSize[1]+2*pad;
 
-        for (let i=0; i<this.inWidth; i++) {
-            for (let j=0; j<this.inHeight; j++) {
+        for (let j=0; j<this.inHeight; j++) {
+            for (let i=0; i<this.inWidth; i++) {
                 if(i<pad || i>prevSize[0]+pad-1 || j<pad || j>prevSize[1]+pad-1) {
                     result[i+this.inWidth*j] = 0;
                 } else {
@@ -107,13 +107,13 @@ export class ConvLayer extends Layer {
         let xRange = this.inWidth-this.size[0];
         let yRange = this.inHeight-this.size[1];
 
-        for (let i=0; i<=xRange; i++) {
-            for (let j=0; j<=yRange; j++) {
+        for (let j=0; j<=yRange; j++) {
+            for (let i=0; i<=xRange; i++) {
                 let v = 0, highIndex = i+this.inWidth*j;
 
-                for (let k=0; k<this.size[0]; k++) {
-                    for (let t=0; t<this.size[1]; t++) {
-                        v += this.image[highIndex+k+t*this.inWidth] * kernel[k+this.size[0]*t];
+                for (let k=0; k<this.size[1]; k++) {
+                    for (let t=0; t<this.size[0]; t++) {
+                        v += this.image[highIndex+t+k*this.inWidth] * kernel[t+this.size[0]*k];
                     }
                 }
 
@@ -147,13 +147,13 @@ export class ConvLayer extends Layer {
 
         for (let i=0; i<this.count; i++) {
             let offset = i*cSize;
-            for (let j=0; j<convSize[0]; j+=subsize[0]) {
-                for (let k=0; k<convSize[1]; k+=subsize[1], p++) {
+            for (let j=0; j<convSize[1]; j+=subsize[1]) {
+                for (let k=0; k<convSize[0]; k+=subsize[0], p++) {
                     let delta = nextDeltas[p]/sSize,
-                        highIndex = j+convSize[0]*k;
+                        highIndex = k+convSize[0]*j;
 
-                    for (let a=0; a<subsize[0]; a++) {
-                        for (let b=0; b<subsize[1]; b++) {
+                    for (let b=0; b<subsize[1]; b++) {
+                        for (let a=0; a<subsize[0]; a++) {
                             this.deltas[highIndex+a+b*convSize[0]+offset] = delta;
                         }
                     }
@@ -166,11 +166,11 @@ export class ConvLayer extends Layer {
         p = 0;
 
         for (let i=0; i<this.count; i++) {
-            for (let j=0; j<xRange; j++) {
-                for (let k=0; k<yRange; k++,p++) {
-                    let highIndex = j+this.inWidth*k;
-                    for (let a=0; a<this.size[0]; a++) {
-                        for (let b=0; b<this.size[1]; b++) {
+            for (let j=0; j<yRange; j++) {
+                for (let k=0; k<xRange; k++,p++) {
+                    let highIndex = k+this.inWidth*j;
+                    for (let b=0; b<this.size[1]; b++) {
+                        for (let a=0; a<this.size[0]; a++) {
                             this.K[i][a+this.size[0]*b] +=
                                 alpha*this.deltas[p]*Utils.sigmoidDerivative(this.in[p])*this.image[highIndex+a+b*this.inWidth];
                         }
