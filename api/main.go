@@ -1,9 +1,13 @@
 package main
 
-import "fmt"
-import "github.com/alexkarpovich/convnet/api/convnet"
+import (
+	"fmt"
+	"github.com/alexkarpovich/convnet/api/convnet"
+)
 
 func main() {
-	cnn := convnet.Convnet{}
+	cnn := convnet.Net{}
+	cnn.Init()
+
 	fmt.Println(cnn)
 }

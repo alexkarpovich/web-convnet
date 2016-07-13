@@ -1,0 +1,26 @@
+{
+  "size": [64, 64],
+  "layers": [
+    {
+      "class": "conv",
+      "size": [5, 5],
+      "featureCount": 6,
+      "shape": "same",
+      "activate": "sigmoid"
+    },
+    {
+      "class": "pool",
+      "size": [2, 2]
+    },
+    {
+      "class": "fc",
+      "size": [300],
+      "activate": "sigmoid"
+    },
+    {
+      "class": "output",
+      "size": [2],
+      "activate": "sigmoid"
+    }
+  ]
+}
