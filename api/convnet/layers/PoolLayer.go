@@ -9,20 +9,20 @@ type PoolLayer struct {
 	count int
 }
 
-func (l PoolLayer) Prepare() {
+func (l *PoolLayer) Prepare() {
 	fmt.Println(l.class)
 	l.count = l.prev.GetProp("count").(int)
 }
 
-func (l PoolLayer) FeedForward() {
+func (l *PoolLayer) FeedForward() {
 
 }
 
-func (l PoolLayer) BackProp() {
+func (l *PoolLayer) BackProp() {
 
 }
 
-func (l PoolLayer) GetProp(name string) interface{} {
+func (l *PoolLayer) GetProp(name string) interface{} {
 	switch name {
 	case "count": return l.count
 	case "kernelSize": return l.size
@@ -32,7 +32,7 @@ func (l PoolLayer) GetProp(name string) interface{} {
 	return nil
 }
 
-func (l PoolLayer) getOutSize() []int {
+func (l *PoolLayer) getOutSize() []int {
 	inSize := l.GetProp("outSize").([]int)
 
 	return []int{inSize[0]/l.size[0], inSize[1]/l.size[1]}

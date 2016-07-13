@@ -1,7 +1,7 @@
 package layers
 
 import (
-	"fmt"
+	//"fmt"
 )
 
 type FCLayer struct {
@@ -9,21 +9,21 @@ type FCLayer struct {
 	weights []float32
 }
 
-func (l FCLayer) Prepare() {
-	size := l.net.GetSize()
-	fmt.Println(size)
+func (l *FCLayer) Prepare() {
+	//size := l.net.GetSize()
+	//fmt.Println(size)
 
 }
 
-func (l FCLayer) FeedForward() {
+func (l *FCLayer) FeedForward() {
 
 }
 
-func (l FCLayer) BackProp() {
+func (l *FCLayer) BackProp() {
 
 }
 
-func (l FCLayer) GetProp(name string) interface{} {
+func (l *FCLayer) GetProp(name string) interface{} {
 	switch name {
 	case "outSize": return l.size
 	}

@@ -43,16 +43,16 @@ type Layer struct {
 	out []float64
 }
 
-func (l Layer) Init(net interfaces.INet, class string, size []int) {
+func (l *Layer) Init(net interfaces.INet, class string, size []int) {
 	l.net = net
 	l.class = GetClass(class)
 	l.size = size
 }
 
-func (l Layer) SetPrev(prevLayer ILayer) {
+func (l *Layer) SetPrev(prevLayer ILayer) {
 	l.prev = prevLayer
 }
 
-func (l Layer) SetNext(nextLayer ILayer) {
+func (l *Layer) SetNext(nextLayer ILayer) {
 	l.next = nextLayer
 }

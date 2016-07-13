@@ -12,13 +12,13 @@ type Net struct {
 	layers []ILayer
 }
 
-func (net Net) Init() {
+func (net *Net) Init() {
 	netConfig := config.GetNetConfig()
 	net.size = netConfig.Size
 	net.initLayers(netConfig.Layers)
 }
 
-func (net Net) initLayers(layersConfig []config.Layer) {
+func (net *Net) initLayers(layersConfig []config.Layer) {
 	net.layers = make([]ILayer, len(layersConfig))
 	var currentLayer, prevLayer ILayer
 
@@ -29,15 +29,15 @@ func (net Net) initLayers(layersConfig []config.Layer) {
 
 		switch lconf.Class {
 		case "conv":
-			convLayer := ConvLayer{Layer:layer}
+			convLayer := &ConvLayer{Layer:layer}
 			convLayer.Construct(lconf.Shape, lconf.Count)
 			currentLayer = convLayer
 			break
-		case "pool": currentLayer = PoolLayer{Layer:layer}
+		case "pool": currentLayer = &PoolLayer{Layer:layer}
 			break
-		case "fc": currentLayer = FCLayer{Layer:layer}
+		case "fc": currentLayer = &FCLayer{Layer:layer}
 			break
-		case "output": currentLayer = OutputLayer{Layer:layer}
+		case "output": currentLayer = &OutputLayer{Layer:layer}
 		}
 
 		if i==0 {
@@ -56,10 +56,10 @@ func (net Net) initLayers(layersConfig []config.Layer) {
 	}
 }
 
-func (net Net) GetSize() []int {
+func (net *Net) GetSize() []int {
 	return net.size
 }
 
-func (net Net) String() string {
+func (net *Net) String() string {
 	return fmt.Sprintf("Convnet")
 }

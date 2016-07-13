@@ -28,13 +28,13 @@ type ConvLayer struct {
 	kernels []float32
 }
 
-func (l ConvLayer) Construct(shape string, count int) {
+func (l *ConvLayer) Construct(shape string, count int) {
 	l.shape = GetShape(shape)
 	l.count = count
 }
 
-func (l ConvLayer) Prepare() {
-	fmt.Println(l.class)
+func (l *ConvLayer) Prepare() {
+	fmt.Println(l.GetProp("count").(int))
 	length := l.count*l.size[0]*l.size[1]
 	l.kernels = make([]float32, length)
 
@@ -43,7 +43,7 @@ func (l ConvLayer) Prepare() {
 	}
 }
 
-func (l ConvLayer) GetProp(name string) interface{} {
+func (l *ConvLayer) GetProp(name string) interface{} {
 	switch name {
 	case "count": return l.count
 	case "kernelSize": return l.size
@@ -53,15 +53,15 @@ func (l ConvLayer) GetProp(name string) interface{} {
 	return nil
 }
 
-func (l ConvLayer) FeedForward() {
+func (l *ConvLayer) FeedForward() {
 
 }
 
-func (l ConvLayer) BackProp() {
+func (l *ConvLayer) BackProp() {
 
 }
 
-func (l ConvLayer) getOutSize() []int {
+func (l *ConvLayer) getOutSize() []int {
 	inSize := l.net.GetSize()
 
 	switch l.shape {
