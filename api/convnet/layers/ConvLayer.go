@@ -43,10 +43,32 @@ func (l ConvLayer) Prepare() {
 	}
 }
 
+func (l ConvLayer) GetProp(name string) interface{} {
+	switch name {
+	case "count": return l.count
+	case "kernelSize": return l.size
+	case "outSize": return l.getOutSize()
+	}
+
+	return nil
+}
+
 func (l ConvLayer) FeedForward() {
 
 }
 
 func (l ConvLayer) BackProp() {
 
+}
+
+func (l ConvLayer) getOutSize() []int {
+	inSize := l.net.GetSize()
+
+	switch l.shape {
+	case VALID: return []int{inSize[0]-l.size[0]+1, inSize[1]-l.size[1]+1}
+	case SAME: return []int{inSize[0], inSize[1]}
+	case FULL: return []int{inSize[0]+l.size[0]-1, inSize[1]+l.size[1]-1}
+	}
+
+	return inSize
 }

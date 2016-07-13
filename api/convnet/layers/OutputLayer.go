@@ -20,3 +20,10 @@ func (l OutputLayer) BackProp() {
 
 }
 
+func (l OutputLayer) GetProp(name string) interface{} {
+	switch name {
+	case "outSize": return l.size
+	}
+
+	return nil
+}

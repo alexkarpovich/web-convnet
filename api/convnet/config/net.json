@@ -4,7 +4,7 @@
     {
       "class": "conv",
       "size": [5, 5],
-      "featureCount": 6,
+      "count": 6,
       "shape": "same",
       "activate": "sigmoid"
     },

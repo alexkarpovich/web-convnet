@@ -1,3 +1,5 @@
 package interfaces
 
-type INet interface {}
+type INet interface {
+	GetSize() []int
+}

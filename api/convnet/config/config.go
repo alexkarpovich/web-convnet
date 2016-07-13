@@ -18,7 +18,7 @@ type Layer struct {
 	Size []int `json:"size"`
 	Activate string `json:"activate"`
 	/* Two below only for conv layer */
-	FeatureCount int `json:"featureCount"`
+	Count int `json:"count"`
 	Shape string `json:"shape"`
 }
 

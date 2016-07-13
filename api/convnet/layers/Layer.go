@@ -25,9 +25,10 @@ func GetClass(class string) LayerClass {
 
 type ILayer interface {
 	Init(interfaces.INet, string, []int)
-	SetPrev(*ILayer)
-	SetNext(*ILayer)
+	SetPrev(ILayer)
+	SetNext(ILayer)
 	Prepare()
+	GetProp(string) interface{}
 	FeedForward()
 	BackProp()
 }
@@ -35,23 +36,23 @@ type ILayer interface {
 type Layer struct {
 	net interfaces.INet
 	class LayerClass
-	prev *ILayer
-	next *ILayer
+	prev ILayer
+	next ILayer
 	size []int
 	S []float64
 	out []float64
 }
 
-func (l *Layer) Init(net interfaces.INet, class string, size []int) {
+func (l Layer) Init(net interfaces.INet, class string, size []int) {
 	l.net = net
 	l.class = GetClass(class)
 	l.size = size
 }
 
-func (l *Layer) SetPrev(prevLayer *ILayer) {
+func (l Layer) SetPrev(prevLayer ILayer) {
 	l.prev = prevLayer
 }
 
-func (l *Layer) SetNext(nextLayer *ILayer) {
+func (l Layer) SetNext(nextLayer ILayer) {
 	l.next = nextLayer
 }
