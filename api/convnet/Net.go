@@ -9,7 +9,7 @@ import (
 
 type Net struct {
 	size []int
-	in []int
+	in []float64
 	out []float64
 	layers []ILayer
 }
@@ -76,17 +76,21 @@ func (net *Net) GetSize() []int {
 	return net.size
 }
 
+func (net *Net) GetInput() []float64 {
+	return net.in
+}
+
 func (net *Net) SetOutput(output []float64) {
 	net.out = output
 }
 
 func (net *Net) prepareInput(img image.Image) {
-	net.in = make([]int, net.size[0] * net.size[1])
+	net.in = make([]float64, net.size[0] * net.size[1])
 
 	for j:=0; j<net.size[1]; j++ {
 		for i:=0; i<net.size[0]; i++ {
 			r, g, b, _ := img.At(i, j).RGBA()
-			net.in[i+net.size[0]*j] = int(0.2989*float64(r) + 0.5870*float64(g) + 0.1140*float64(b));
+			net.in[i+net.size[0]*j] = 0.2989*float64(r) + 0.5870*float64(g) + 0.1140*float64(b);
 		}
 	}
 }
