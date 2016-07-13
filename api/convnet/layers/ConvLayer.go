@@ -25,7 +25,7 @@ type ConvLayer struct {
 	*Layer
 	shape ConvShape
 	count int
-	kernels []float32
+	kernels []float64
 }
 
 func (l *ConvLayer) Construct(shape string, count int) {
@@ -36,10 +36,10 @@ func (l *ConvLayer) Construct(shape string, count int) {
 func (l *ConvLayer) Prepare() {
 	fmt.Println(l.GetProp("count").(int))
 	length := l.count*l.size[0]*l.size[1]
-	l.kernels = make([]float32, length)
+	l.kernels = make([]float64, length)
 
 	for i := 0; i < length; i++ {
-		l.kernels[i] = rand.Float32()*2-1
+		l.kernels[i] = rand.Float64()*2-1
 	}
 }
 

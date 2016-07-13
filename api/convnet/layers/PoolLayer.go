@@ -33,7 +33,7 @@ func (l *PoolLayer) GetProp(name string) interface{} {
 }
 
 func (l *PoolLayer) getOutSize() []int {
-	inSize := l.GetProp("outSize").([]int)
+	inSize := l.prev.GetProp("outSize").([]int)
 
 	return []int{inSize[0]/l.size[0], inSize[1]/l.size[1]}
 }

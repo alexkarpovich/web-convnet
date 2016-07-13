@@ -2,6 +2,7 @@ package convnet
 
 import (
 	"fmt"
+	"image"
 	"github.com/alexkarpovich/convnet/api/convnet/config"
 	. "github.com/alexkarpovich/convnet/api/convnet/layers"
 )
@@ -9,6 +10,7 @@ import (
 type Net struct {
 	size []int
 	in []int
+	out []float64
 	layers []ILayer
 }
 
@@ -56,8 +58,37 @@ func (net *Net) initLayers(layersConfig []config.Layer) {
 	}
 }
 
+func (net *Net) Train() {
+
+}
+
+func (net *Net) Test(img image.Image) {
+	bounds := img.Bounds()
+	net.size = []int{bounds.Max.X, bounds.Max.Y}
+	net.prepareInput(img)
+
+	for i := range net.layers {
+		net.layers[i].FeedForward()
+	}
+}
+
 func (net *Net) GetSize() []int {
 	return net.size
+}
+
+func (net *Net) SetOutput(output []float64) {
+	net.out = output
+}
+
+func (net *Net) prepareInput(img image.Image) {
+	net.in = make([]int, net.size[0] * net.size[1])
+
+	for j:=0; j<net.size[1]; j++ {
+		for i:=0; i<net.size[0]; i++ {
+			r, g, b, _ := img.At(i, j).RGBA()
+			net.in[i+net.size[0]*j] = int(0.2989*float64(r) + 0.5870*float64(g) + 0.1140*float64(b));
+		}
+	}
 }
 
 func (net *Net) String() string {

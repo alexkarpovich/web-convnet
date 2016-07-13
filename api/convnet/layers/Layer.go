@@ -39,7 +39,7 @@ type Layer struct {
 	prev ILayer
 	next ILayer
 	size []int
-	S []float64
+	in []float64
 	out []float64
 }
 
