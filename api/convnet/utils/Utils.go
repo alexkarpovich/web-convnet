@@ -51,3 +51,31 @@ func PrepareInput(data []float64, shape string, imgSize []int, kernelSize []int)
 
 	return result, outSize
 }
+
+func Conv2d(input []float64, inputSize []int, kernel []float64, kernelSize []int) ([]float64, []float64) {
+	p := 0
+	iRange := inputSize[0] - kernelSize[0]
+	jRange := inputSize[1] - kernelSize[1]
+	length := inputSize[0] * inputSize[1]
+	S := make([]float64, length)
+	A := make([]float64, length)
+
+	for j := 0; j < jRange; j++ {
+		for i := 0; i < iRange; i++ {
+			v := 0.0
+			highIndex := i + inputSize[0] * j
+
+			for b := 0; b < kernelSize[1]; b++ {
+				for a := 0; a < kernelSize[0]; a++ {
+					v += input[highIndex+a+b*inputSize[0]] * kernel[a+kernelSize[0]*b];
+				}
+			}
+
+			S[p] = v
+			A[p] = Sigmoid(v)
+			p++
+		}
+	}
+
+	return S, A
+}

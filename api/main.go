@@ -37,6 +37,6 @@ func main() {
 	}
 
 	trainingSet := LoadImages(examples)
-	trainParams := interfaces.TrainParams{MaxIteration:1000, MinError: 0.001}
+	trainParams := interfaces.TrainParams{MaxIteration:1000, MinError: 0.1}
 	cnn.Train(trainParams, trainingSet)
 }

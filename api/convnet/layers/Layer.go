@@ -10,6 +10,7 @@ type ILayer interface {
 	SetNext(ILayer)
 	Prepare()
 	GetClass() string
+	GetSize() []int
 	GetProp(string) interface{}
 	FeedForward()
 	BackProp()
@@ -41,4 +42,8 @@ func (l *Layer) SetNext(nextLayer ILayer) {
 
 func (l *Layer) GetClass() string {
 	return l.class
+}
+
+func (l *Layer) GetSize() []int {
+	return l.size
 }
