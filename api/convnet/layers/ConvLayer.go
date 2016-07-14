@@ -105,20 +105,21 @@ func (l *ConvLayer) BackProp() {
 	cLength := convSize[0]*convSize[1]
 	iRange := l.imSize[0]-l.size[0];
 	jRange := l.imSize[1]-l.size[1];
-	p, t := 0, 0
+	t := 0
 
+	l.computeDeltas(cLength, sLength, convSize, subsize, nextDeltas)
 	for z:=0; z<l.inCount; z++ {
-		l.computeDeltas(z, cLength, sLength, convSize, subsize, nextDeltas, &p)
 		l.correctWeights(z, sLength, iRange, jRange, alpha, &t)
 	}
 }
 
-func (l *ConvLayer) computeDeltas(z, cLength, sLength int, convSize, subsize []int, nextDeltas []float64, p *int) {
+func (l *ConvLayer) computeDeltas(cLength, sLength int, convSize, subsize []int, nextDeltas []float64) {
+	p := 0
 	for k := 0; k < l.count; k++ {
-		offset := cLength*(k+z);
+		offset := cLength*k;
 		for j := 0; j < convSize[1]; j += subsize[1] {
 			for i := 0; i < convSize[0]; i += subsize[0] {
-				delta := nextDeltas[*p] / float64(sLength)
+				delta := nextDeltas[p] / float64(sLength)
 				highIndex := i+convSize[0]*j
 
 				for b := 0; b < subsize[1]; b++ {
@@ -126,7 +127,7 @@ func (l *ConvLayer) computeDeltas(z, cLength, sLength int, convSize, subsize []i
 						l.deltas[highIndex+a+b*convSize[0]+offset] = delta;
 					}
 				}
-				(*p)++
+				p++
 			}
 		}
 	}
@@ -143,7 +144,7 @@ func (l *ConvLayer) correctWeights(z, sLength, iRange, jRange int, alpha float64
 				for b:=0; b<l.size[1]; b++ {
 					for a:=0; a<l.size[0]; a++ {
 						l.kernels[a+l.size[0]*b+offset] +=
-						alpha*l.deltas[*t]*DSigmoid(l.in[*t])*l.im[highIndex+a+b*l.imSize[0]];
+							alpha*l.deltas[*t]*DSigmoid(l.in[*t])*l.im[highIndex+a+b*l.imSize[0]];
 					}
 				}
 

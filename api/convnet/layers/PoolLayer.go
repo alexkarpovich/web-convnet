@@ -3,7 +3,8 @@ package layers
 import (
 	//"fmt"
 	"math"
-	//. "github.com/alexkarpovich/convnet/api/convnet/utils"
+	"sort"
+	. "github.com/alexkarpovich/convnet/api/convnet/utils"
 )
 
 type PoolLayer struct {
@@ -51,26 +52,32 @@ func (l *PoolLayer) BackProp() {
 	nextClass := l.next.GetClass()
 	nextDeltas := l.next.GetProp("deltas").([]float64);
 	nextIn := l.next.GetProp("in").([]float64);
+	outSize := l.getOutSize()
+	l.deltas = make([]float64, l.count*outSize[0]*outSize[1])
 
 	if nextClass == "conv" {
-		//nextKernels := l.next.GetProp("kernels").([]float64)
-		//nextOutSize := l.next.GetProp("outSize").([]int)
-		//nextKernelSize := l.next.GetSize()
-		//
-		//length := nextOutSize[0]*nextOutSize[1]
-		//kStep := l.size[0] * l.size[1]
-		//
-		//for z:=0; z<l.count; z++ {
-		//	data, _ := PrepareInput(nextDeltas[z*length:z*length+length], nextOutSize, nextKernelSize, "same")
-		//
-		//	for k := 0; k < l.count; k++ {
-		//		kOffset := kStep * k
-		//
-		//		S, A:= Conv2d(data, outSize, l.kernels[kOffset:kOffset+kStep], l.size)
-		//		l.in = append(l.in, S...)
-		//		l.out = append(l.out, A...)
-		//	}
-		//}
+		nextKernels := l.next.GetProp("kernels").([]float64)
+		nextOutSize := l.next.GetProp("outSize").([]int)
+		nextCount := l.next.GetProp("count").(int)
+		nextKernelSize := l.next.GetSize()
+
+		length := nextOutSize[0]*nextOutSize[1]
+		kStep := nextKernelSize[0] * nextKernelSize[1]
+
+		for z:=0; z<l.count; z++ {
+			for k := 0; k < nextCount; k++ {
+				kOffset := kStep * k
+				data, _ := PrepareInput(nextDeltas[k*length:k*length+length], "same", nextOutSize, nextKernelSize)
+
+				reversedKernels := nextKernels[kOffset:kOffset+kStep]
+				sort.Reverse(sort.Float64Slice(reversedKernels))
+				_, A:= Conv2d(data, nextOutSize, reversedKernels, nextKernelSize)
+
+				for i := range l.deltas {
+					l.deltas[i+z*length] += A[i]
+				}
+			}
+		}
 
 
 	} else {
