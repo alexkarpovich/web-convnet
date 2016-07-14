@@ -9,6 +9,7 @@ import (
 type FCLayer struct {
 	*Layer
 	weights [][]float64
+	deltas []float64
 }
 
 func (l *FCLayer) Prepare() {
@@ -27,6 +28,7 @@ func (l *FCLayer) Prepare() {
 
 	l.in = make([]float64, l.size[0])
 	l.out = make([]float64, l.size[0])
+	l.deltas = make([]float64, l.size[0])
 }
 
 func (l *FCLayer) FeedForward() {
@@ -46,12 +48,37 @@ func (l *FCLayer) FeedForward() {
 }
 
 func (l *FCLayer) BackProp() {
+	alpha := 0.001;
+	prevOut := l.prev.GetProp("out").([]float64);
+	inSize := l.prev.GetProp("outSize").([]int)
+	nextDeltas := l.next.GetProp("deltas").([]float64);
+	nextIn := l.next.GetProp("in").([]float64);
+	nextWeights := l.next.GetProp("weights").([][]float64);
 
+	for i:=0; i<l.size[0]; i++ {
+		v := 0.0;
+
+		for k:=0; k<len(nextIn); k++ {
+			v -= nextDeltas[k]*DSigmoid(nextIn[k])*nextWeights[i][k];
+		}
+
+		l.deltas[i] = v;
+	}
+
+	for j:=0; j<l.size[0]; j++ {
+		for i:=0; i<inSize[0];i++ {
+			l.weights[i][j] += alpha*l.deltas[j]*DSigmoid(l.in[j])*prevOut[i];
+		}
+	}
 }
 
 func (l *FCLayer) GetProp(name string) interface{} {
 	switch name {
 	case "outSize": return l.size
+	case "out": return l.out
+	case "in": return l.in
+	case "deltas": return l.deltas
+	case "weights": return l.weights
 	}
 
 	return nil

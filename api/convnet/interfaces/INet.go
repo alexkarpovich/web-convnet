@@ -9,6 +9,7 @@ type INet interface {
 	GetSize() []int
 	GetInput() []float64
 	SetOutput([]float64)
-	Train()
+	SetError(float64)
+	Train(TrainParams, map[image.Image][]float64)
 	Test(image.Image)
 }

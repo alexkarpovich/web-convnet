@@ -10,8 +10,10 @@ type ConvLayer struct {
 	*Layer
 	shape string
 	count int
+	imSize []int
 	kernels []float64
 	im []float64
+	deltas []float64
 }
 
 func (l *ConvLayer) Construct(shape string, count int) {
@@ -29,9 +31,11 @@ func (l *ConvLayer) Prepare() {
 
 	outSize := l.getOutSize()
 
+	l.imSize = make([]int, 2)
 	l.in = make([]float64, outSize[0]*outSize[1]*l.count)
 	l.im = make([]float64, outSize[0]*outSize[1])
 	l.out = make([]float64, outSize[0]*outSize[1]*l.count)
+	l.deltas = make([]float64, outSize[0]*outSize[1]*l.count)
 }
 
 func (l *ConvLayer) GetProp(name string) interface{} {
@@ -48,6 +52,7 @@ func (l *ConvLayer) GetProp(name string) interface{} {
 func (l *ConvLayer) FeedForward() {
 	data, outSize := PrepareInput(l.net.GetInput(), l.shape, l.net.GetSize(), l.size)
 	l.im = data
+	l.imSize = outSize
 	p := 0
 	kStep := l.size[0]*l.size[1]
 	iRange := outSize[0]-l.size[0]
@@ -76,7 +81,53 @@ func (l *ConvLayer) FeedForward() {
 }
 
 func (l *ConvLayer) BackProp() {
+	alpha := 0.001;
+	nextDeltas := l.next.GetProp("deltas").([]float64);
+	subsize := l.next.GetProp("size").([]int);
+	convSize := l.getOutSize();
+	p := 0
+	sSize := subsize[0]*subsize[1]
+	cSize := convSize[0]*convSize[1]
 
+	for k:=0; k<l.count; k++ {
+		offset := k*cSize;
+		for j:=0; j<convSize[1]; j+=subsize[1] {
+			for i:=0; i<convSize[0]; i+=subsize[0] {
+				delta := nextDeltas[p]/float64(sSize)
+				highIndex := i+convSize[0]*j
+
+				for b:=0; b<subsize[1]; b++ {
+					for a:=0; a<subsize[0]; a++ {
+						l.deltas[highIndex+a+b*convSize[0]+offset] = delta;
+					}
+				}
+				p++
+			}
+		}
+	}
+
+	iRange := l.imSize[0]-l.size[0];
+	jRange := l.imSize[1]-l.size[1];
+	p = 0;
+
+	for k:=0; k<l.count; k++ {
+		offset := k*sSize
+
+		for j:=0; j<jRange; j++ {
+			for i:=0; i<iRange; i++ {
+				highIndex := i+l.imSize[0]*j;
+
+				for b:=0; b<l.size[1]; b++ {
+					for a:=0; a<l.size[0]; a++ {
+						l.kernels[a+l.size[0]*b+offset] +=
+							alpha*l.deltas[p]*DSigmoid(l.in[p])*l.im[highIndex+a+b*l.imSize[0]];
+					}
+				}
+
+				p++
+			}
+		}
+	}
 }
 
 func (l *ConvLayer) getOutSize() []int {

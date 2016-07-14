@@ -5,6 +5,7 @@ import (
 	"image"
 	"github.com/alexkarpovich/convnet/api/convnet/config"
 	. "github.com/alexkarpovich/convnet/api/convnet/layers"
+	. "github.com/alexkarpovich/convnet/api/convnet/interfaces"
 )
 
 type Net struct {
@@ -12,6 +13,8 @@ type Net struct {
 	in []float64
 	out []float64
 	layers []ILayer
+	label []float64
+	err float64
 }
 
 func (net *Net) Init() {
@@ -58,18 +61,34 @@ func (net *Net) initLayers(layersConfig []config.Layer) {
 	}
 }
 
-func (net *Net) Train() {
+func (net *Net) Train(params TrainParams, examples map[image.Image][]float64) {
+	var err float64 = 10.0
+	iter := 1
 
+	for err > params.MinError {
+		err = 0
+
+		for img, label := range examples {
+			net.setExample(img, label)
+			net.forward()
+			net.backward()
+
+			err += net.err
+		}
+
+		fmt.Println("Iteration ", iter, ", error=", err, ", out=", net.out)
+
+		iter++
+	}
 }
 
 func (net *Net) Test(img image.Image) {
 	bounds := img.Bounds()
 	net.size = []int{bounds.Max.X, bounds.Max.Y}
 	net.prepareInput(img)
+	net.forward()
 
-	for i := range net.layers {
-		net.layers[i].FeedForward()
-	}
+	fmt.Println(net.out)
 }
 
 func (net *Net) GetSize() []int {
@@ -84,6 +103,10 @@ func (net *Net) SetOutput(output []float64) {
 	net.out = output
 }
 
+func (net *Net) SetError(err float64) {
+	net.err = err
+}
+
 func (net *Net) prepareInput(img image.Image) {
 	net.in = make([]float64, net.size[0] * net.size[1])
 
@@ -95,6 +118,19 @@ func (net *Net) prepareInput(img image.Image) {
 	}
 }
 
-func (net *Net) String() string {
-	return fmt.Sprintf("Convnet")
+func (net *Net) forward() {
+	for i := range net.layers {
+		net.layers[i].FeedForward()
+	}
+}
+
+func (net *Net) backward() {
+	for i := range net.layers {
+		net.layers[len(net.layers)-i-1].BackProp()
+	}
+}
+
+func (net *Net) setExample(img image.Image, label []float64) {
+	net.prepareInput(img)
+	net.label = label
 }
