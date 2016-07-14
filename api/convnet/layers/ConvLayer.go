@@ -10,6 +10,7 @@ type ConvLayer struct {
 	*Layer
 	shape string
 	count int
+	inCount int
 	imSize []int
 	kernels []float64
 	im []float64
@@ -19,6 +20,7 @@ type ConvLayer struct {
 func (l *ConvLayer) Construct(shape string, count int) {
 	l.shape = shape
 	l.count = count
+	l.inCount = 1
 }
 
 func (l *ConvLayer) Prepare() {
@@ -50,33 +52,60 @@ func (l *ConvLayer) GetProp(name string) interface{} {
 }
 
 func (l *ConvLayer) FeedForward() {
-	data, outSize := PrepareInput(l.net.GetInput(), l.shape, l.net.GetSize(), l.size)
-	l.im = data
-	l.imSize = outSize
-	p := 0
-	kStep := l.size[0]*l.size[1]
-	iRange := outSize[0]-l.size[0]
-	jRange := outSize[1]-l.size[1]
+	isFirst := true
+	input := l.net.GetInput()
+	inputSize := l.net.GetSize()
+	var prevOut []float64
 
-	for k:=0; k<l.count; k++ {
-		kOffset := kStep * k
+	if l.prev != nil {
+		prevClass := l.prev.GetClass()
+		isFirst = false
 
-		for j:=0; j<jRange; j++ {
-			for i:=0; i<iRange; i++ {
-				v := 0.0
-				highIndex := i+outSize[0]*j
+		if prevClass=="conv" || prevClass=="pool" {
+			l.inCount = l.prev.GetProp("count").(int)
+			inputSize = l.prev.GetProp("outSize").([]int)
+			prevOut = l.prev.GetProp("out").([]float64)
+		}
+	}
 
-				for b:=0; b<l.size[1]; b++ {
-					for a:=0; a<l.size[0]; a++ {
-						v += data[highIndex+a+b*outSize[0]] * l.kernels[a+l.size[0]*b+kOffset];
+	l.im = []float64{}
+	length := inputSize[0]*inputSize[1]
+
+	for z:=0; z<l.inCount; z++ {
+		if isFirst == false {
+			input = prevOut[z*length:z*length+length]
+		}
+
+		data, outSize := PrepareInput(input, l.shape, inputSize, l.size)
+
+		p := z*outSize[0]*outSize[1]
+		kStep := l.size[0] * l.size[1]
+		iRange := outSize[0] - l.size[0]
+		jRange := outSize[1] - l.size[1]
+
+		for k := 0; k < l.count; k++ {
+			kOffset := kStep * k
+
+			for j := 0; j < jRange; j++ {
+				for i := 0; i < iRange; i++ {
+					v := 0.0
+					highIndex := i + outSize[0] * j
+
+					for b := 0; b < l.size[1]; b++ {
+						for a := 0; a < l.size[0]; a++ {
+							v += data[highIndex + a + b * outSize[0]] * l.kernels[a + l.size[0] * b + kOffset];
+						}
 					}
-				}
 
-				l.in[p] = v
-				l.out[p] = Sigmoid(v)
-				p++
+					l.in[p] = v
+					l.out[p] = Sigmoid(v)
+					p++
+				}
 			}
 		}
+
+		l.im = append(l.im, data...)
+		l.imSize = outSize
 	}
 }
 
