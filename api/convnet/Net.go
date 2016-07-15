@@ -3,9 +3,11 @@ package convnet
 import (
 	"fmt"
 	"image"
+	"runtime"
 	"github.com/alexkarpovich/convnet/api/convnet/config"
 	. "github.com/alexkarpovich/convnet/api/convnet/layers"
 	. "github.com/alexkarpovich/convnet/api/convnet/interfaces"
+	"runtime/debug"
 )
 
 type Net struct {
@@ -63,6 +65,7 @@ func (net *Net) initLayers(layersConfig []config.Layer) {
 
 func (net *Net) Train(params TrainParams, examples map[image.Image][]float64) {
 	var err float64 = 10.0
+	var mem runtime.MemStats
 	iter := 1
 
 	for err > params.MinError {
@@ -76,7 +79,10 @@ func (net *Net) Train(params TrainParams, examples map[image.Image][]float64) {
 			err += net.err
 		}
 
-		fmt.Println("Iteration ", iter, ", error=", err, ", out=", net.out)
+
+		runtime.ReadMemStats(&mem)
+
+		fmt.Println("Iteration ", iter, ", error=", err, ", out=", net.out, mem.Alloc, mem.TotalAlloc, mem.HeapAlloc, mem.HeapSys)
 
 		iter++
 	}

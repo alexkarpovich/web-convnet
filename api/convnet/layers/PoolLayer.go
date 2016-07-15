@@ -15,7 +15,9 @@ type PoolLayer struct {
 
 func (l *PoolLayer) Prepare() {
 	outSize := l.getOutSize()
-	l.count = l.prev.GetProp("count").(int)
+	prevCount := l.prev.GetProp("count").(int)
+	prevInCount := l.prev.GetProp("inCount").(int)
+	l.count = prevCount * prevInCount
 	l.out = make([]float64, l.count*outSize[0]*outSize[1])
 	l.deltas = make([]float64, l.count*outSize[0]*outSize[1])
 }
@@ -62,18 +64,19 @@ func (l *PoolLayer) BackProp() {
 		nextKernelSize := l.next.GetSize()
 
 		length := nextOutSize[0]*nextOutSize[1]
-		kStep := nextKernelSize[0] * nextKernelSize[1]
+		kStep := nextKernelSize[0]*nextKernelSize[1]
 
 		for z:=0; z<l.count; z++ {
 			for k := 0; k < nextCount; k++ {
 				kOffset := kStep * k
-				data, _ := PrepareInput(nextDeltas[k*length:k*length+length], "same", nextOutSize, nextKernelSize)
+				data, preSize := PrepareInput(nextDeltas[k*length:k*length+length], "same", nextOutSize, nextKernelSize)
 
 				reversedKernels := nextKernels[kOffset:kOffset+kStep]
 				sort.Reverse(sort.Float64Slice(reversedKernels))
-				_, A:= Conv2d(data, nextOutSize, reversedKernels, nextKernelSize)
+				_, A:= Conv2d(data, preSize, reversedKernels, nextKernelSize)
 
-				for i := range l.deltas {
+
+				for i:=0; i<length; i++ {
 					l.deltas[i+z*length] += A[i]
 				}
 			}

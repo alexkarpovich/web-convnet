@@ -54,9 +54,9 @@ func PrepareInput(data []float64, shape string, imgSize []int, kernelSize []int)
 
 func Conv2d(input []float64, inputSize []int, kernel []float64, kernelSize []int) ([]float64, []float64) {
 	p := 0
-	iRange := inputSize[0] - kernelSize[0]
-	jRange := inputSize[1] - kernelSize[1]
-	length := inputSize[0] * inputSize[1]
+	iRange := inputSize[0]-kernelSize[0] + 1
+	jRange := inputSize[1]-kernelSize[1] + 1
+	length := iRange * jRange
 	S := make([]float64, length)
 	A := make([]float64, length)
 
