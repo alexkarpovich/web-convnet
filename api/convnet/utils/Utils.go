@@ -79,3 +79,14 @@ func Conv2d(input []float64, inputSize []int, kernel []float64, kernelSize []int
 
 	return S, A
 }
+
+func ReverseArray(input []float64) []float64 {
+	length := len(input)
+	result := make([]float64, length)
+
+	for i := range input {
+		result[length-i-1] = input[i]
+	}
+
+	return result
+}

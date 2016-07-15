@@ -3,7 +3,6 @@ package layers
 import (
 	//"fmt"
 	"math"
-	"sort"
 	. "github.com/alexkarpovich/convnet/api/convnet/utils"
 )
 
@@ -71,8 +70,7 @@ func (l *PoolLayer) BackProp() {
 				kOffset := kStep * k
 				data, preSize := PrepareInput(nextDeltas[k*length:k*length+length], "same", nextOutSize, nextKernelSize)
 
-				reversedKernels := nextKernels[kOffset:kOffset+kStep]
-				sort.Reverse(sort.Float64Slice(reversedKernels))
+				reversedKernels := ReverseArray(nextKernels[kOffset:kOffset+kStep])
 				_, A:= Conv2d(data, preSize, reversedKernels, nextKernelSize)
 
 

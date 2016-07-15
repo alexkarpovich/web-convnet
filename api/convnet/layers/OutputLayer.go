@@ -52,7 +52,7 @@ func (l *OutputLayer) FeedForward() {
 
 func (l *OutputLayer) BackProp() {
 	alpha := 0.001
-	label := []float64{1,0};
+	label := l.net.GetLabel();
 	inSize := l.prev.GetProp("outSize").([]int)
 	prevOut := l.prev.GetProp("out").([]float64)
 

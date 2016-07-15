@@ -2,12 +2,13 @@ package convnet
 
 import (
 	"fmt"
+	"time"
 	"image"
 	"runtime"
+	"github.com/petar/GoMNIST"
 	"github.com/alexkarpovich/convnet/api/convnet/config"
 	. "github.com/alexkarpovich/convnet/api/convnet/layers"
 	. "github.com/alexkarpovich/convnet/api/convnet/interfaces"
-	"runtime/debug"
 )
 
 type Net struct {
@@ -63,26 +64,27 @@ func (net *Net) initLayers(layersConfig []config.Layer) {
 	}
 }
 
-func (net *Net) Train(params TrainParams, examples map[image.Image][]float64) {
+func (net *Net) Train(params TrainParams, trainingSet *GoMNIST.Set) {
 	var err float64 = 10.0
 	var mem runtime.MemStats
 	iter := 1
 
 	for err > params.MinError {
 		err = 0
+		start := time.Now()
 
-		for img, label := range examples {
-			net.setExample(img, label)
+		for i:=0; i<100; i++ {
+			net.setMNISTExample(trainingSet.Images[i], trainingSet.Labels[i])
 			net.forward()
 			net.backward()
 
 			err += net.err
 		}
 
+		elapsed := time.Since(start)
 
 		runtime.ReadMemStats(&mem)
-
-		fmt.Println("Iteration ", iter, ", error=", err, ", out=", net.out, mem.Alloc, mem.TotalAlloc, mem.HeapAlloc, mem.HeapSys)
+		fmt.Println(iter, "E =", err, ", took=", elapsed, "sec, alloc=", mem.Alloc/1048576, "MB")
 
 		iter++
 	}
@@ -103,6 +105,10 @@ func (net *Net) GetSize() []int {
 
 func (net *Net) GetInput() []float64 {
 	return net.in
+}
+
+func (net *Net) GetLabel() []float64 {
+	return net.label
 }
 
 func (net *Net) SetOutput(output []float64) {
@@ -139,4 +145,29 @@ func (net *Net) backward() {
 func (net *Net) setExample(img image.Image, label []float64) {
 	net.prepareInput(img)
 	net.label = label
+}
+
+func (net *Net) setMNISTExample(img GoMNIST.RawImage, label GoMNIST.Label) {
+	net.prepareMNISTInput(img)
+	net.prepareMNISTLabel(label)
+}
+
+func (net *Net) prepareMNISTInput(img GoMNIST.RawImage) {
+	net.in = make([]float64, net.size[0] * net.size[1])
+
+	for i:=0; i<len(img); i++ {
+		net.in[i] = float64(img[i]);
+	}
+}
+
+func (net *Net) prepareMNISTLabel(label GoMNIST.Label) {
+	net.label = make([]float64, 10)
+
+	for i:=0; i<10; i++ {
+		if int(label) == i {
+			net.label[i] = 1
+		} else {
+			net.label[i] = 0;
+		}
+	}
 }
