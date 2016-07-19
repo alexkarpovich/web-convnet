@@ -1,11 +1,11 @@
 import {Component} from 'angular2/core'
 
 @Component({
-    selector: 'convnet-view',
+    selector: 'convnet-setup',
     template: `
-        Convnet View
+        <textarea></textarea>
     `
 })
-export class ConvnetView {
+export class ConvnetSetup {
     constructor() {}
 }
