@@ -11,6 +11,7 @@ export class ConvnetService {
 
     constructor() {
         this._ws = new $WebSocket("ws://localhost:7777/");
+        this._ws.getDataStream().subscribe(val => console.log(val));
     }
 
     get isEditing() {
@@ -32,5 +33,12 @@ export class ConvnetService {
     set isEditing(isEdit) {
         this._isEditing = isEdit;
         this._editing$.next(isEdit);
+    }
+
+    public setupNetwork(params:any) {
+        this._ws.send({
+            type: 'net:setup',
+            data: params
+        });
     }
 }

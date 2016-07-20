@@ -17,7 +17,7 @@ import {ConvnetSetup} from './convnet-setup'
         </div>
     </div>
     `,
-    directives: [NgIf, ConvnetView]
+    directives: [NgIf, ConvnetView, ConvnetSetup]
 })
 export class ConvnetContainer {
     isEditing:boolean;

@@ -20,7 +20,6 @@ input[type=text], select {
 }
 
 input[type=submit], button {
-    width: 100%;
     background-color: #4CAF50;
     color: white;
     padding: 8px 10px;
@@ -32,6 +31,10 @@ input[type=submit], button {
 
 input[type=submit]:hover {
     background-color: #45a049;
+}
+
+label {
+    font-size: 0.7em;
 }
 
 .convnet {
@@ -55,6 +58,22 @@ input[type=submit]:hover {
     .convnet-container {
         width: 70%;
         background-color: #F1F1F1;
+
+        .convnet-setup {
+            .setup-layer {
+                padding: 5px;
+                margin: 5px;
+                background-color: #FFFAD5;
+                border-radius: 5px;
+                border: 1px solid #D6D5D0;
+                text-align: center;
+
+                .layer-type, .layer-shape, .layer-size, .layer-count {
+                    width: 100px;
+                    margin: 0;
+                }
+            }
+        }
     }
 
     .convnet-config {
