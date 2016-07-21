@@ -9,7 +9,8 @@ import {NgModel, NgIf} from 'angular2/common'
             <option value="" disabled>Type</option>
             <option *ngFor="let t of types" [value]="t" >{{t}}</option>
         </select>
-        <input type="text" class="layer-size" [(ngModel)]="layer.size" (ngModelChange)="updateModel($event)"/>
+        <input type="number" class="layer-size" [(ngModel)]="layer.size[0]" (ngModelChange)="updateModel($event)"/>
+        <input type="number" class="layer-size" [(ngModel)]="layer.size[1]" (ngModelChange)="updateModel($event)"/>
         <input *ngIf="layer.type=='conv'" type="number" class="layer-count" [(ngModel)]="layer.count" (ngModelChange)="updateModel($event)"/>
         <select *ngIf="layer.type=='conv'" [(ngModel)]="layer.shape" class="layer-shape" (ngModelChange)="updateModel($event)">
             <option value="" disabled>Shape</option>

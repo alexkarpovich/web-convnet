@@ -8,7 +8,8 @@ import {ConvnetService} from '../services/convnet.service'
     template: `
     <div class="convnet-setup">
         <label for="inputSize">Input Size: </label>
-        <input type="text" id="inputSize" class="inputSize" [(ngModel)]="_size" />
+        <input type="number" class="inputSize" [(ngModel)]="_size[0]" />
+        <input type="number" class="inputSize" [(ngModel)]="_size[1]" />
         <label>Layers: </label>
         <setup-layer *ngFor="let l of _layers; let i=index" [(layer)]="_layers[i]"></setup-layer>
         <div class="controls">
@@ -21,7 +22,7 @@ import {ConvnetService} from '../services/convnet.service'
     directives: [SetupLayer, NgFor, NgModel]
 })
 export class ConvnetSetup {
-    private _size:string = "28x28";
+    private _size:number[] = [28, 28];
     private _layers:any[] = [];
 
     constructor(private convnetService:ConvnetService) {}
