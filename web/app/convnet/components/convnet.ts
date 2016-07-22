@@ -1,7 +1,7 @@
 import {Component} from 'angular2/core'
 import {ConvnetContainer} from './convnet-container'
 import {ConvnetConfig} from './convnet-config'
-import {ConvnetService} from "../services/convnet.service";
+import {ConvnetService} from "../services/convnet.service"
 
 @Component({
     selector: 'convnet',

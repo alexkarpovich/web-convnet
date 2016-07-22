@@ -5,16 +5,18 @@ import (
 	"net/http"
 	"encoding/json"
 	"github.com/gorilla/websocket"
-	//"github.com/alexkarpovich/convnet"
+	"github.com/alexkarpovich/convnet"
 	"github.com/alexkarpovich/convnet/config"
 )
 
 type Message struct {
 	Type string `json:"type"`
-	Data []byte `json:"data"`
+	Data interface{} `json:"data"`
 }
 
 type WSHandler struct {}
+
+var cnn convnet.Net
 
 func (h *WSHandler) Index(w http.ResponseWriter, r *http.Request) {
 	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
@@ -24,8 +26,8 @@ func (h *WSHandler) Index(w http.ResponseWriter, r *http.Request) {
 	} else if err != nil {
 		return
 	}
-
-	message := Message{}
+	var data json.RawMessage
+	message := Message{Data:&data}
 
 	for {
 		err := conn.ReadJSON(&message)
@@ -33,7 +35,7 @@ func (h *WSHandler) Index(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		outmsg := HandleMessage(message)
+		outmsg := HandleMessage(message, data)
 
 		if err = conn.WriteJSON(&outmsg); err != nil {
 			panic(err)
@@ -41,13 +43,17 @@ func (h *WSHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleMessage(msg Message) Message {
+func HandleMessage(msg Message, data json.RawMessage) Message {
 
 	switch msg.Type {
 	case "net:setup":
-		data := config.Net{}
-		json.Unmarshal(msg.Data, &data)
-		log.Println(data.Size)
+		conf := config.Net{}
+		json.Unmarshal(data, &conf)
+
+		cnn = new(convnet.Net)
+		cnn.FromConfig(conf)
+
+		log.Println(conf.Size)
 	}
 
 	return msg
