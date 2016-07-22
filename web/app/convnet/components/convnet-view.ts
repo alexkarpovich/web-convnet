@@ -1,4 +1,5 @@
 import {Component} from 'angular2/core'
+import {ConvnetService} from '../services/convnet.service'
 
 @Component({
     selector: 'convnet-view',
@@ -7,5 +8,5 @@ import {Component} from 'angular2/core'
     `
 })
 export class ConvnetView {
-    constructor() {}
+    constructor(private convnetService:ConvnetService) {}
 }

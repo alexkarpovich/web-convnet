@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"log"
+	"io/ioutil"
 	"net/http"
 	"encoding/json"
 	"github.com/gorilla/websocket"
@@ -16,7 +17,7 @@ type Message struct {
 
 type WSHandler struct {}
 
-var cnn convnet.Net
+var cnn *convnet.Net
 
 func (h *WSHandler) Index(w http.ResponseWriter, r *http.Request) {
 	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
@@ -53,7 +54,23 @@ func HandleMessage(msg Message, data json.RawMessage) Message {
 		cnn = new(convnet.Net)
 		cnn.FromConfig(conf)
 
-		log.Println(conf.Size)
+		byteConfig, err := json.Marshal(conf)
+		if err != nil {
+			log.Fatalf("File error: %v\n", err)
+			panic(err)
+		}
+		ioutil.WriteFile("configs/net1.json", byteConfig, 0644)
+
+		log.Println("New network was successfully set up")
+		break
+	case "net:config":
+		file, err := ioutil.ReadFile("config/net1.json")
+		if err != nil {
+			log.Fatalf("File error: %v\n", err)
+		}
+
+		return Message{Type:"net:config", Data: file}
+		break
 	}
 
 	return msg

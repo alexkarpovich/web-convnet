@@ -35,10 +35,20 @@ export class ConvnetService {
         this._editing$.next(isEdit);
     }
 
+    get stream$() {
+        return this._ws.getDataStream();
+    }
+
     public setupNetwork(params:any) {
         this._ws.send({
             type: 'net:setup',
             data: params
+        });
+    }
+
+    public getNetConfig() {
+        this._ws.send({
+            type: "net:config"
         });
     }
 }
