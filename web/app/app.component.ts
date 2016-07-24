@@ -15,4 +15,6 @@ import {Convnet} from './convnet/components/convnet'
 @RouteConfig([
 	{path: '/', name: 'Convnet', component: Convnet}
 ])
-export class AppComponent {}
+export class AppComponent {
+
+}

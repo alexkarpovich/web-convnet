@@ -37,6 +37,7 @@ export class ConvnetSetup {
             layers: this._layers
         });
         this.convnetService.isEditing = false;
+        this.convnetService.getNetConfig();
     }
 
     cancel() {

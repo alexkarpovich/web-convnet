@@ -1,1 +1,1 @@
-{"size":[28,28],"layers":[{"type":"conv","size":[5,5],"activate":"","count":6,"shape":"same"}]}
+{"size":[28,28],"layers":[{"type":"conv","size":[3,3],"activate":"","count":6,"shape":"same"},{"type":"pool","size":[2,2],"activate":"","count":0,"shape":""},{"type":"conv","size":[3,3],"activate":"","count":3,"shape":"same"},{"type":"pool","size":[2,2],"activate":"","count":0,"shape":""},{"type":"fc","size":[300],"activate":"","count":0,"shape":""},{"type":"output","size":[10],"activate":"","count":0,"shape":""}]}
