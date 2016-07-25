@@ -49,15 +49,15 @@ label {
         color: #444;
     }
 
-    .convnet-container, .convnet-config {
-        height: 100%;
-        float: left;
-        padding: 10px;
+    .convnet-menu {
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
     .convnet-container {
-        width: 70%;
-        background-color: #0e7773;
+        height: 100%;
+        padding: 10px;
+        display: flex;
 
         .convnet-setup {
             .setup-layer {
@@ -76,15 +76,14 @@ label {
         }
 
         .convnet-view {
+            width: 100%;
             canvas {
                 width: 100%;
             }
         }
-    }
 
-    .convnet-config {
-        width: 30%;
-        background-color: #DEDEDE;
-        border-left: 1px solid #D4D4D4;
+        .convnet-readings {
+            min-width: 200px;
+        }
     }
 }

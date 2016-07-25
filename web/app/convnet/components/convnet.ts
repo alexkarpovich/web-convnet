@@ -1,25 +1,26 @@
 import {Component} from 'angular2/core'
 import {NgIf} from 'angular2/common'
-import {ConvnetContainer} from './convnet-container'
-import {ConvnetConfig} from './convnet-config'
-import {ConvnetService} from "../services/convnet.service"
+import {DataService} from '../services/data.service'
+import {ConvnetMenu} from './menu'
+import {ConvnetContainer} from './container'
+
 
 @Component({
     selector: 'convnet',
     template: `
-        <div *ngIf="!initialized">Init connection...</div>
-        <div *ngIf="initialized" class="convnet">
-            <convnet-container></convnet-container>
-            <convnet-config></convnet-config>
+        <div *ngIf="!connected">Init connection...</div>
+        <div *ngIf="connected" class="convnet">
+            <convnet-menu></convnet-menu> 
+            <convnet-container></convnet-container> 
         </div>
     `,
-    directives: [ConvnetContainer, ConvnetConfig, NgIf],
-    providers: [ConvnetService]
+    directives: [NgIf, ConvnetMenu, ConvnetContainer],
+    providers: [DataService]
 })
 export class Convnet {
-    private initialized:boolean = false;
+    private connected:boolean = false;
 
-    constructor(private convnetService:ConvnetService) {
-        this.convnetService.onopen(()=>this.initialized=true);
+    constructor(private dataService:DataService) {
+        this.dataService.onopen(()=>this.connected=true);
     }
 }
