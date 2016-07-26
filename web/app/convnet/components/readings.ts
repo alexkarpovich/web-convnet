@@ -1,4 +1,5 @@
 import {Component} from 'angular2/core'
+import {DataService} from '../services/data.service'
 
 @Component({
     selector: 'convnet-readings',
@@ -9,5 +10,7 @@ import {Component} from 'angular2/core'
     `
 })
 export class ConvnetReadings {
-    constructor() {}
+    constructor(private dataService:DataService) {
+
+    }
 }

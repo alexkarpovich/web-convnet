@@ -15,6 +15,8 @@ export class DataService {
     constructor() {
         this._stream$ = new Observable(observer => this._observer=observer);
         this._ws = new $WebSocket("ws://localhost:7777/");
+        this._ws.onClose(()=>setTimeout(()=>this._ws.reconnect(), 5000));
+
         this._ws.getDataStream().subscribe((event:any)=> {
             let msg = JSON.parse(event.data);
             this._observer.next(msg);
@@ -59,12 +61,16 @@ export class DataService {
         this._ws.send({type: "net:config"});
     }
 
-    public train(trainPrams:ITrainParams) {
-        this._ws.send({type: "net:startTraining", data: trainPrams});
+    public startTraining(trainPrams:ITrainParams) {
+        this._ws.send({type: "training:start", data: trainPrams});
     }
 
     public stopTraining() {
-        this._ws.send({type: "net:stopTraining"});
+        this._ws.send({type: "training:stop"});
+    }
+
+    public trainingState() {
+        this._ws.send({type: "training:state"});
     }
 
     public save() {

@@ -4,7 +4,6 @@ import {DataService} from '../services/data.service'
 import {ConvnetMenu} from './menu'
 import {ConvnetContainer} from './container'
 
-
 @Component({
     selector: 'convnet',
     template: `

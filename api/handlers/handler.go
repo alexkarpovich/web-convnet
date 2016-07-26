@@ -58,8 +58,9 @@ func (h *Handler) Handle(msg Message, data json.RawMessage) {
 	switch msg.Type {
 	case "net:setup": h.netSetup(data)
 	case "net:config": h.netConfig(data)
-	case "net:startTraining": h.netStartTraining(data)
-	case "net:stopTraining": h.netStopTraining(data)
+	case "training:start": h.startTraining(data)
+	case "training:stop": h.stopTraining(data)
+	case "training:state": h.trainingState(data)
 	case "net:saveWeights": h.netSaveWeights(data)
 	}
 }
@@ -97,6 +98,11 @@ func saveWeights() {
 	ioutil.WriteFile("configs/weights.json", byteWeights, 0644)
 }
 
+func trainingState(h *Handler, state bool) {
+	err := h.Conn.WriteJSON(Message{Type: "training:state", Data: state})
+	check(err)
+}
+
 func (h *Handler) netSetup(data json.RawMessage) {
 	conf := config.Net{}
 	json.Unmarshal(data, &conf)
@@ -115,20 +121,28 @@ func (h *Handler) netConfig(data json.RawMessage) {
 	check(err)
 }
 
-func (h *Handler) netStartTraining(data json.RawMessage) {
+func (h *Handler) startTraining(data json.RawMessage) {
 	trainParams := interfaces.TrainParams{}
 	json.Unmarshal(data, &trainParams)
 
-	trainingSet, _,  err := Load("/home/akarpovich/dev/gopacks/src/github.com/petar/GoMNIST/data")
+	trainingSet, _,  err := Load("/home/aliaksandr/dev/gopacks/src/github.com/petar/GoMNIST/data")
 	check(err)
 
 	go func() {
 		cnn.Train(trainParams, trainingSet)
+		trainingState(h ,false)
 	}()
+
+	trainingState(h, true)
 }
 
-func (h *Handler) netStopTraining(data json.RawMessage) {
+func (h *Handler) stopTraining(data json.RawMessage) {
 	cnn.StopTraining()
+	trainingState(h, false)
+}
+
+func (h *Handler) trainingState(data json.RawMessage) {
+	trainingState(h, cnn.IsTraining())
 }
 
 func (h *Handler) netSaveWeights(data json.RawMessage) {
