@@ -19,12 +19,12 @@ export class ConvnetMenu {
 
     constructor(private dataService:DataService) {
         this.dataService.stream$.subscribe((msg:IMessage) => {
-            console.log(msg);
             switch(msg.type) {
                 case 'training:state': this.isTraining = msg.data; break;
             }
         });
-        setInterval(()=>this.dataService.trainingState(), 2000);
+
+        this.dataService.trainingState();
     }
 
     newNetwork() {}

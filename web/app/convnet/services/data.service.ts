@@ -7,20 +7,21 @@ import {ITrainParams, IMessage} from '../definitions/convnet'
 export class DataService {
     private _ws:$WebSocket;
     private _stream$:Observable<any>;
-    private _observer:Observer<IMessage>;
     private _editing$:Subject<any> = new Subject();
     private _isEditing:boolean = false;
     private _config:any;
 
     constructor() {
-        this._stream$ = new Observable(observer => this._observer=observer);
         this._ws = new $WebSocket("ws://localhost:7777/");
-        this._ws.onClose(()=>setTimeout(()=>this._ws.reconnect(), 5000));
-
-        this._ws.getDataStream().subscribe((event:any)=> {
-            let msg = JSON.parse(event.data);
-            this._observer.next(msg);
+        let wsstream$ = this._ws.getDataStream();
+        this._stream$ = Observable.create(observer => {
+            wsstream$.subscribe((event:any)=> {
+                let msg = JSON.parse(event.data);
+                observer.next(msg);
+            });
         });
+
+        this._ws.onClose(()=>setTimeout(()=>this._ws.reconnect(), 5000));
         this._ws.connect();
     }
 
