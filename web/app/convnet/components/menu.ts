@@ -10,6 +10,7 @@ import {IMessage} from "../definitions/convnet";
         <button type="button" (click)="newNetwork()">New Network</button>
         <button *ngIf="!isTraining" type="button" (click)="startTraining()">Start traninig</button>
         <button *ngIf="isTraining" type="button" (click)="stopTraining()">Stop traninig</button>
+        <button type="button" (click)="save()">Save</button>
     </div>
     `,
     directives: [NgIf]
@@ -39,5 +40,9 @@ export class ConvnetMenu {
 
     stopTraining() {
         this.dataService.stopTraining();
+    }
+
+    save() {
+        this.dataService.save();
     }
 }

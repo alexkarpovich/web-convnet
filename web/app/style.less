@@ -52,12 +52,13 @@ label {
     .convnet-menu {
         padding-left: 10px;
         padding-right: 10px;
+        border-bottom: 2px solid #C3C3C4;
     }
 
     .convnet-container {
         height: 100%;
         padding: 10px;
-        display: flex;
+        position: relative;
 
         .convnet-setup {
             .setup-layer {
@@ -76,14 +77,25 @@ label {
         }
 
         .convnet-view {
-            width: 100%;
+            position :absolute;
+            top:0;
+            left:0;
+            bottom:0;
+            right:300px;
+            padding: 10px;
+
             canvas {
                 width: 100%;
             }
         }
 
         .convnet-readings {
-            min-width: 200px;
+            position : absolute;
+            top:0;
+            right:0;
+            width: 300px;
+            height: 100%;
+            border-left: 4px double #C3C3C4;
         }
     }
 }

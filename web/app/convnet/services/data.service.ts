@@ -21,7 +21,7 @@ export class DataService {
             });
         });
 
-        this._ws.onClose(()=>setTimeout(()=>this._ws.reconnect(), 5000));
+        this._ws.onClose(()=>setTimeout(()=>this.reconnect(), 5000));
         this._ws.connect();
     }
 
@@ -52,6 +52,11 @@ export class DataService {
 
     public onopen(callback) {
         this._ws.onOpen(callback);
+    }
+
+    public reconnect() {
+        this._ws.reconnect();
+        this.trainingState();
     }
 
     public setupNetwork(params:any) {
