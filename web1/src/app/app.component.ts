@@ -1,4 +1,9 @@
 import {Component} from '@angular/core'
 
-@Component()
+@Component({
+    selector: 'my-app',
+    template: `
+    Hello
+    `
+})
 export class App {}
