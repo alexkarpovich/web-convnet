@@ -1,4 +1,4 @@
-import 'core-js';
+import 'es6-shim';
 import 'reflect-metadata';
 import 'zone.js/dist/zone'
 
@@ -11,7 +11,3 @@ import '@angular/router';
 
 // RxJS
 import 'rxjs';
-import 'rxjs/Rx';
-
-// Other vendors for example jQuery, Lodash or Bootstrap
-// You can import js, ts, css, sass, ...

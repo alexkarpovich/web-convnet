@@ -24,7 +24,6 @@ export class DataService {
             });
         });
 
-        map(wsstream$.asObservable, event=>JSON.parse(event.data));
         this._ws.onClose(()=>setTimeout(()=>this.reconnect(), 5000));
         this._ws.connect();
     }
