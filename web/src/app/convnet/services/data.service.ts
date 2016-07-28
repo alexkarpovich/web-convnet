@@ -1,30 +1,18 @@
-import {Injectable} from '@angular/core'
-import {$WebSocket} from 'angular2-websocket/angular2-websocket'
-import {Subject} from 'rxjs/Subject'
-import {Observable} from 'rxjs/Observable'
-import {map} from 'rxjs/operator/map'
-import {ITrainParams, IMessage} from '../definitions/convnet'
-import 'rxjs/add/operator/map'
+import {Injectable} from '@angular/core';
+import {$WebSocket} from 'angular2-websocket/angular2-websocket';
+import {Subject} from 'rxjs/Subject';
+import {ITrainParams} from '../convnet.d';
 
 @Injectable()
 export class DataService {
-    private _ws:$WebSocket;
-    private _stream$: Observable<IMessage>;
-    private _editing$:Subject<any> = new Subject();
-    private _isEditing:boolean = false;
-    private _config:any;
+    private _ws: $WebSocket;
+    private _editing$: Subject<any> = new Subject();
+    private _isEditing: boolean = false;
+    private _config: any;
 
     constructor() {
-        this._ws = new $WebSocket("ws://localhost:7777/");
-        let wsstream$ = this._ws.getDataStream();
-        this._stream$ = Observable.create((observer:any) => {
-            wsstream$.subscribe((event:any)=> {
-                let msg = JSON.parse(event.data);
-                observer.next(msg);
-            });
-        });
-
-        this._ws.onClose(()=>setTimeout(()=>this.reconnect(), 5000));
+        this._ws = new $WebSocket('ws://localhost:7777/');
+        this._ws.onClose(() => setTimeout(() => this.reconnect(), 5000));
         this._ws.connect();
     }
 
@@ -37,23 +25,23 @@ export class DataService {
     }
 
     get config() {
-        return this._config
+        return this._config;
     }
 
-    set config(newConfig) {
-        this._config = newConfig
+    set config(newConfig: any) {
+        this._config = newConfig;
     }
 
-    set isEditing(isEdit) {
+    set isEditing(isEdit: boolean) {
         this._isEditing = isEdit;
         this._editing$.next(isEdit);
     }
 
     get stream$() {
-        return this._stream$;
+        return this._ws.getDataStream().map((event: any) => JSON.parse(event.data));
     }
 
-    public onopen(callback:any) {
+    public onopen(callback: any) {
         this._ws.onOpen(callback);
     }
 
@@ -62,27 +50,27 @@ export class DataService {
         this.trainingState();
     }
 
-    public setupNetwork(params:any) {
+    public setupNetwork(params: any) {
         this._ws.send({type: 'net:setup', data: params});
     }
 
     public getNetConfig() {
-        this._ws.send({type: "net:config"});
+        this._ws.send({type: 'net:config'});
     }
 
-    public startTraining(trainPrams:ITrainParams) {
-        this._ws.send({type: "training:start", data: trainPrams});
+    public startTraining(trainPrams: ITrainParams) {
+        this._ws.send({type: 'training:start', data: trainPrams});
     }
 
     public stopTraining() {
-        this._ws.send({type: "training:stop"});
+        this._ws.send({type: 'training:stop'});
     }
 
     public trainingState() {
-        this._ws.send({type: "training:state"});
+        this._ws.send({type: 'training:state'});
     }
 
     public save() {
-        this._ws.send({type: "net:saveWeights"});
+        this._ws.send({type: 'net:saveWeights'});
     }
 }

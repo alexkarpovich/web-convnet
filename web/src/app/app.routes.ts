@@ -1,5 +1,10 @@
-import {Convnet} from './convnet/components/convnet'
+import { provideRouter, RouterConfig } from '@angular/router';
+import { ConvnetComponent } from './convnet';
 
-export const AppRoutes:Object[] = [
-    {path: '', component: Convnet}
+export const routes: RouterConfig = [
+  { path: '', component: ConvnetComponent }
+];
+
+export const APP_ROUTER_PROVIDERS = [
+  provideRouter(routes)
 ];
