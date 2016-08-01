@@ -9,7 +9,7 @@ import '@angular/router';
 // RxJS
 import 'rxjs';
 
-import 'chart.js/dist/Chart.min.js'
+import 'chart.js/dist/Chart.min.js';
 
 // Other vendors for example jQuery, Lodash or Bootstrap
 // You can import js, ts, css, sass, ...

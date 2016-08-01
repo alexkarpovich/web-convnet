@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {NgIf} from '@angular/common';
 import {DataService} from '../services/data.service';
 import {IMessage} from '../convnet.d';
-import {PopupDirective, PopupComponent} from '../../common/popup';
+import {PopoverDirective, PopoverComponent} from '../../common/popover';
 
 @Component({
     selector: 'convnet-menu',
@@ -12,15 +12,13 @@ import {PopupDirective, PopupComponent} from '../../common/popup';
         <button *ngIf="!isTraining" type="button" (click)="startTraining()">Start traninig</button>
         <button *ngIf="isTraining" type="button" (click)="stopTraining()">Stop traninig</button>
         <button type="button" (click)="save()">Save</button>
-        <button type="button" popup [popupComponent]="testing">Testing</button>
-        <popup #testing>
-            <header>Hello, i'm header</header>
-            <content>Hello, i'm content</content>
-            <footer>Hello, i'm footer</footer>
-        </popup>
+        <button type="button" popover="" [popoverComponent]="testing">Testing</button>
+        <popover #testing >
+            <div style="width: 200px;">Hello, i'm content</div>
+        </popover>
     </div>
     `,
-    directives: [NgIf, PopupDirective, PopupComponent],
+    directives: [NgIf, PopoverDirective, PopoverComponent],
     styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent {
@@ -39,8 +37,8 @@ export class MenuComponent {
     startTraining() {
         this.dataService.startTraining({
             maxIterations: 1000,
-            minError: 0.01,
-            learningRate: 0.001
+            minError: 1,
+            learningRate: 0.1
         });
     }
 

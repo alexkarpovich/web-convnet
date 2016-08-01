@@ -28,22 +28,47 @@ input[type=submit], button {
     cursor: pointer;
 }
 
-input[type=submit]:hover {
+input[type=submit]:hover, button:hover {
     background-color: #45a049;
+}
+
+input[type=submit]:active, button:active {
+    background-color: #3c783c;
 }
 
 label {
     font-size: 0.7em;
 }
 
-.popup {
+.popover {
     background-color: white;
     border-radius: 4px;
     box-shadow: 0 1px 5px #333;
     display: none;
-    padding: 10px;
     position: absolute;
     z-index: 100;
+
+    &:before, &:after {
+        content: ' ';
+        height: 0;
+        position: absolute;
+        width: 0;
+        border: 10px solid transparent;
+        left: 50%;
+        transform: translate(-50%, 0);
+    }
+
+    &:before {
+        border-bottom-color: #fff;
+        z-index: 2;
+        top: -19px;
+    }
+
+    &:after {
+        border-bottom-color: #797979;
+        z-index: 1;
+        top: -20px;
+    }
 
     &.open {
         display: block;

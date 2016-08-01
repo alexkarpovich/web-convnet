@@ -108,6 +108,6 @@
     "directive-class-suffix": true,
     "directive-selector-prefix": [false, "my"],
     "component-selector-prefix": [false, "my"],
-    "pipe-naming": [true, "camelCase", "my"]
+    "pipe-naming": [false, "camelCase", "my"]
   }
 }
