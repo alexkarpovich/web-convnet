@@ -62,6 +62,7 @@ func (h *Handler) Handle(msg Message, data json.RawMessage) {
 	case "training:stop": h.stopTraining(data)
 	case "training:state": h.trainingState(data)
 	case "net:saveWeights": h.netSaveWeights(data)
+	case "net:test": h.netTest(data);
 	}
 }
 
@@ -125,7 +126,7 @@ func (h *Handler) startTraining(data json.RawMessage) {
 	trainParams := interfaces.TrainParams{}
 	json.Unmarshal(data, &trainParams)
 
-	trainingSet, _,  err := Load("/home/akarpovich/dev/gopacks/src/github.com/petar/GoMNIST/data")
+	trainingSet, _,  err := Load("/home/aliaksandr/dev/gopacks/src/github.com/petar/GoMNIST/data")
 	check(err)
 
 	go func() {
@@ -147,4 +148,12 @@ func (h *Handler) trainingState(data json.RawMessage) {
 
 func (h *Handler) netSaveWeights(data json.RawMessage) {
 	saveWeights()
+}
+
+func (h *Handler) netTest(data json.RawMessage) {
+	var rawImage []byte
+	json.Unmarshal(data, &rawImage);
+
+	err := h.Conn.WriteJSON(Message{Type: "net:test", Data: cnn.Test(rawImage)})
+	check(err)
 }

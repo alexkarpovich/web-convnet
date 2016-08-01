@@ -73,4 +73,8 @@ export class DataService {
     public save() {
         this._ws.send({type: 'net:saveWeights'});
     }
+
+    public test(rawImage: number[]) {
+        this._ws.send({type: 'net:test', data: rawImage});
+    }
 }

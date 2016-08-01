@@ -3,6 +3,7 @@ import {NgIf} from '@angular/common';
 import {DataService} from '../services/data.service';
 import {IMessage} from '../convnet.d';
 import {PopoverDirective, PopoverComponent} from '../../common/popover';
+import {TestingComponent} from './testining.component';
 
 @Component({
     selector: 'convnet-menu',
@@ -12,13 +13,13 @@ import {PopoverDirective, PopoverComponent} from '../../common/popover';
         <button *ngIf="!isTraining" type="button" (click)="startTraining()">Start traninig</button>
         <button *ngIf="isTraining" type="button" (click)="stopTraining()">Stop traninig</button>
         <button type="button" (click)="save()">Save</button>
-        <button type="button" popover="" [popoverComponent]="testing">Testing</button>
-        <popover #testing >
-            <div style="width: 200px;">Hello, i'm content</div>
+        <button type="button" [popover]="testing">Testing</button>
+        <popover #testing [width]="400" [height]="440">
+            <testing></testing>
         </popover>
     </div>
     `,
-    directives: [NgIf, PopoverDirective, PopoverComponent],
+    directives: [NgIf, PopoverDirective, PopoverComponent, TestingComponent],
     styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent {

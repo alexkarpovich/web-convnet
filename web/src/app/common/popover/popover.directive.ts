@@ -5,7 +5,7 @@ import {PopoverComponent} from './popover.component';
     selector: '[popover]'
 })
 export class PopoverDirective {
-    @Input() popoverComponent: PopoverComponent;
+    @Input() popover: PopoverComponent;
     hostElement: HTMLElement;
     isOpen: boolean = false;
 
@@ -28,8 +28,8 @@ export class PopoverDirective {
 
     updateComponent() {
         let hostRect = this.hostElement.getBoundingClientRect();
-        this.popoverComponent.visible = this.isOpen;
-        setTimeout(() => this.popoverComponent.offset = hostRect, 0);
+        this.popover.offset = hostRect;
+        this.popover.visible = this.isOpen;
     }
 
 

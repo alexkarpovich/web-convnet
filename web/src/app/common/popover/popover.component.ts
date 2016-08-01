@@ -1,43 +1,46 @@
-import {Component, Input, AfterViewChecked, ElementRef} from '@angular/core';
+import {Component, Input, ViewChild, ViewContainerRef, ElementRef} from '@angular/core';
 import {NgClass, NgStyle} from '@angular/common';
-
-interface IOffset {
-    left: number;
-    top: number;
-}
 
 @Component({
     selector: 'popover',
     template: `
-    <div 
-        [ngClass]="{popover: true, open: isVisible}" 
-        [ngStyle]="{'left': _offset.left+'px', 'top': _offset.top+'px'}">
-        <ng-content></ng-content>
+    <div
+        [ngClass]="{popover: true, open: isVisible}"
+        [ngStyle]="_style">
+        <div class="content">
+            <ng-content></ng-content>
+        </div>
     </div>
     `,
     directives: [NgClass, NgStyle]
 })
 export class PopoverComponent {
+    @Input() width: number;
+    @Input() height: number;
+    @ViewChild('content') contentRef: ElementRef;
     private isVisible: boolean = false;
-    private _offset: IOffset = {
+    private _style: any = {
         left: 0,
-        top: 0
+        top: 0,
+        width: this.width + 'px',
+        height: this.height + 'px'
     };
 
-    constructor(private el: ElementRef) {}
+    ngOnInit() {
+        this._style.width = this.width + 'px';
+        this._style.height = this.height + 'px';
+    }
+
+    ngAfterContentInit() {
+        console.log(this.contentRef);
+    }
 
     set visible(isVisible) {
         this.isVisible = isVisible;
     }
 
     set offset(hostRect) {
-        let selfElement = this.el.nativeElement;
-        let root = selfElement.querySelector('div');
-        let selfRect = root.getBoundingClientRect();
-
-        this._offset = {
-            left: hostRect.left - (selfRect.width - hostRect.width) / 2,
-            top: hostRect.bottom + 10
-        };
+        this._style.left = hostRect.left - (this.width - hostRect.width) / 2 + 'px';
+        this._style.top = hostRect.bottom + 10 + 'px';
     }
 }
