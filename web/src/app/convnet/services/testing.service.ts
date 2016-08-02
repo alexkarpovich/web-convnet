@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 
 interface IPoint {
-    x: number
-    y: number
+    x: number;
+    y: number;
 }
 
 @Injectable()
@@ -10,7 +10,7 @@ export class TestingService {
     private _points: IPoint[] = [];
     private _dragging: boolean[] = [];
 
-    get points():IPoint[] {
+    get points(): IPoint[] {
         return this._points;
     }
 

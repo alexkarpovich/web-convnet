@@ -29,6 +29,7 @@ export class TestingComponent implements OnInit {
         this.dataService.stream$.subscribe((msg: IMessage) => {
             switch (msg.type) {
                 case 'net:test': console.log(msg.data); break;
+
             }
         });
     }
@@ -55,8 +56,8 @@ export class TestingComponent implements OnInit {
 
     redraw() {
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
-        this.context.strokeStyle = "#ffffff";
-        this.context.lineJoin = "round";
+        this.context.strokeStyle = '#ffffff';
+        this.context.lineJoin = 'round';
         this.context.lineWidth = 2;
 
         let points = this.testingService.points;
@@ -65,7 +66,7 @@ export class TestingComponent implements OnInit {
         for(let i = 0; i < points.length; i++) {
             this.context.beginPath();
 
-            if (dragging[i] && i){
+            if (dragging[i] && i) {
                 this.context.moveTo(points[i - 1].x, points[i - 1].y);
             } else {
                 this.context.moveTo(points[i].x - 1, points[i].y);
@@ -92,11 +93,11 @@ export class TestingComponent implements OnInit {
         }
     }
 
-    onMouseUp(e) {
+    onMouseUp() {
         this.isDown = false;
     }
 
-    onMouseLeave(e) {
+    onMouseLeave() {
         this.isDown = false;
     }
 }

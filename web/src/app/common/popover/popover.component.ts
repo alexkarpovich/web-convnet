@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild, ViewContainerRef, ElementRef} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {NgClass, NgStyle} from '@angular/common';
 
 @Component({
@@ -14,10 +14,9 @@ import {NgClass, NgStyle} from '@angular/common';
     `,
     directives: [NgClass, NgStyle]
 })
-export class PopoverComponent {
+export class PopoverComponent implements OnInit {
     @Input() width: number;
     @Input() height: number;
-    @ViewChild('content') contentRef: ElementRef;
     private isVisible: boolean = false;
     private _style: any = {
         left: 0,
@@ -30,11 +29,6 @@ export class PopoverComponent {
         this._style.width = this.width + 'px';
         this._style.height = this.height + 'px';
     }
-
-    ngAfterContentInit() {
-        console.log(this.contentRef);
-    }
-
     set visible(isVisible) {
         this.isVisible = isVisible;
     }

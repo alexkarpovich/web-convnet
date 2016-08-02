@@ -126,7 +126,7 @@ func (h *Handler) startTraining(data json.RawMessage) {
 	trainParams := interfaces.TrainParams{}
 	json.Unmarshal(data, &trainParams)
 
-	trainingSet, _,  err := Load("/home/aliaksandr/dev/gopacks/src/github.com/petar/GoMNIST/data")
+	trainingSet, _,  err := Load("/home/akarpovich/dev/gopacks/src/github.com/petar/GoMNIST/data")
 	check(err)
 
 	go func() {
