@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {NgIf} from '@angular/common';
 import {DataService} from '../services/data.service';
+import {WorkerService} from '../services/worker.service';
 import {MenuComponent} from './menu.component';
 import {ContainerComponent} from './container.component';
 
@@ -15,7 +16,7 @@ import {ContainerComponent} from './container.component';
     `,
     styleUrls: ['./convnet.component.scss'],
     directives: [NgIf, MenuComponent, ContainerComponent],
-    providers: [DataService]
+    providers: [DataService, WorkerService]
 })
 export class ConvnetComponent {
     private connected: boolean = false;
