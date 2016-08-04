@@ -4,11 +4,6 @@ import {DataService} from '../services/data.service';
 import {WorkerService} from '../services/worker.service';
 import {IMessage} from '../convnet.d';
 
-let FC_SIZE = 5,
-    OUT_SIZE = 15,
-    VSTEP = 5,
-    HSTEP = 2;
-
 @Component({
     selector: 'convnet-view',
     template: `
@@ -25,13 +20,18 @@ export class ViewComponent implements OnInit {
     private height: number = 400;
     private _ctx: CanvasRenderingContext2D;
     private _config: any;
-    private vpos: number = 0;
 
     constructor(private dataService: DataService, private workerService: WorkerService) {
         this.dataService.stream$.subscribe((msg: IMessage) => {
             switch (msg.type) {
                 case 'net:config': this._config = msg.data; break;
                 case 'net:state': this.state = msg.data; break;
+            }
+        });
+
+        this.workerService.stream$.subscribe((msg: IMessage) => {
+            switch (msg.type) {
+                case 'view:image': this._ctx.putImageData(msg.data, 0, 0); break;
             }
         });
     }
