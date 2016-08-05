@@ -250,8 +250,8 @@ module.exports = function makeWebpackConfig() {
 
   config.worker = {
     output: {
-      filename: "hash.worker.js",
-      chunkFilename: "[id].hash.worker.js"
+      filename: "[hash].worker.js",
+      chunkFilename: "[id].[hash].worker.js"
     }
   };
 

@@ -54,6 +54,7 @@
     "remap-istanbul": "^0.6.4",
     "rimraf": "^2.5.1",
     "sass-loader": "^4.0.0",
+    "serviceworker-loader": "^0.1.0",
     "shelljs": "^0.7.0",
     "style-loader": "^0.13.0",
     "ts-helpers": "^1.1.1",

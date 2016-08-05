@@ -1,6 +1,7 @@
 import '../style/app.scss';
-import { Component } from '@angular/core';
-import { ROUTER_DIRECTIVES } from '@angular/router';
+import {Component} from '@angular/core';
+import {ROUTER_DIRECTIVES} from '@angular/router';
+import TestServiceWorker = require('serviceworker?name=test.service!./workers/test.serviceworker');
 
 @Component({
     selector: 'app',
@@ -13,5 +14,8 @@ import { ROUTER_DIRECTIVES } from '@angular/router';
 })
 export class AppComponent {
     constructor() {
+        if ('serviceWorker' in navigator) {
+            TestServiceWorker({scope: '/'}).then(() => console.log('succes'), () => console.log('error'));
+        }
     }
 }
